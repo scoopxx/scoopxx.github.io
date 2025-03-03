@@ -1,0 +1,76 @@
+baseURL = "https://yourusername.github.io/"
+languageCode = "en-us"
+title = "Hxx'Log"
+theme = "PaperMod"
+
+# Enable search
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+[params]
+  title = "Hxx'Log"
+  description = "Brain dump and share my learnings and notes here."
+  author = "hxx"
+  
+  # PaperMod specific options
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  ShowShareButtons = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  
+  [params.profileMode]
+    enabled = true
+    title = "scoop"
+    subtitle = "MLE, ex-Googler, generally curious about how everything works"
+
+    # For search
+  [params.fuseOpts]
+    isCaseSensitive = false
+    shouldSort = true
+    location = 0
+    distance = 1000
+    threshold = 0.4
+    minMatchCharLength = 0
+    keys = ["title", "permalink", "summary", "content"]
+    
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/scoopxx"
+  
+#   [[params.socialIcons]]
+#     name = "twitter"
+#     url = "https://twitter.com/yourusername"
+
+# Main menu configuration
+[menu]
+  [[menu.main]]
+    identifier = "posts"
+    name = "Posts"
+    url = "/posts/"
+    weight = 10
+  
+  [[menu.main]]
+    identifier = "tags"
+    name = "Tags"
+    url = "/tags/"
+    weight = 20
+  
+  [[menu.main]]
+    identifier = "categories"
+    name = "Categories"
+    url = "/categories/"
+    weight = 30
+    
+  [[menu.main]]
+    identifier = "search"
+    name = "Search"
+    url = "/search/"
+    weight = 40
+    
+  [[menu.main]]
+    identifier = "about"
+    name = "About"
+    url = "/about/"
+    weight = 50

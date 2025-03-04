@@ -3,27 +3,29 @@ languageCode = "en-us"
 title = "Hxx'Log"
 theme = "PaperMod"
 
+enableEmoji = true  # This enables emoji shortcodes
+
 # Enable search
 [outputs]
   home = ["HTML", "RSS", "JSON"]
 
 [params]
   title = "Hxx'Log"
-  description = "Brain dump and share my learnings and notes here."
+  description = "Brain dump and share my learnings here."
   author = "hxx"
   
   # PaperMod specific options
   defaultTheme = "auto"
+  disableThemeToggle = false
   ShowReadingTime = true
   ShowShareButtons = true
   ShowPostNavLinks = true
   ShowBreadCrumbs = true
   ShowCodeCopyButtons = true
-  
-  [params.profileMode]
-    enabled = true
-    title = "scoop"
-    subtitle = "MLE, ex-Googler, generally curious about how everything works"
+    
+  [params.homeInfoParams]
+    title = "Hi there! :wave:"
+    content = "Hi, welcome to my blog! I'm hxx, a SWE/MLE fascinated by how everything works. This blog is my space to dump my learnings, mostly on LLM, maybe other stuff too."
 
     # For search
   [params.fuseOpts]
@@ -42,6 +44,7 @@ theme = "PaperMod"
 #   [[params.socialIcons]]
 #     name = "twitter"
 #     url = "https://twitter.com/yourusername"
+
 
 # Main menu configuration
 [menu]
@@ -74,3 +77,4 @@ theme = "PaperMod"
     name = "About"
     url = "/about/"
     weight = 50
+  

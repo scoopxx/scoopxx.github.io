@@ -1,1 +1,40 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Posts on Hxx'Log</title><link>https://yourusername.github.io/posts/</link><description>Recent content in Posts on Hxx'Log</description><generator>Hugo -- 0.145.0</generator><language>en-us</language><lastBuildDate>Mon, 03 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://yourusername.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>My First Post</title><link>https://yourusername.github.io/posts/first-test-post/</link><pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate><guid>https://yourusername.github.io/posts/first-test-post/</guid><description>&lt;p>Used for testinig, nothing interesting here.&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on Hxx&#39;Log</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on Hxx&#39;Log</description>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 03 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>KV Cache Explained</title>
+      <link>http://localhost:1313/posts/kv-cache/</link>
+      <pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/kv-cache/</guid>
+      <description>&lt;h3 id=&#34;what-is-kv-cache&#34;&gt;What is KV Cache?&lt;/h3&gt;
+&lt;p&gt;I am not intended to spend too much time on details of KV cache. But as a reference, I found the interpretation in this this post &lt;a href=&#34;https://medium.com/@joaolages/kv-caching-explained-276520203249&#34;&gt;Transformers KV Caching Explained&lt;/a&gt; very intuitive, so I&amp;rsquo;ll just steal the gif here.&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;Comparison of self-attention with and without KV attention&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/kv-cache.gif&#34;&gt;&lt;/p&gt;
+&lt;p&gt;To summarize, in auto-regressive language model,when generating a new token, all its previous tokens are fed into the attention layer for computation. In an attention layer, denote the text input/generation sequence as $X$, where as $i$ th token is $x_i$. When in step $i$, we are predicting $X_i$, the formula is:
+$$
+q_{i} = embed_i * W_q \quad(1, d_{model})
+$$
+$$
+k_{i} = embed_i * W_k \quad(1, d_{model})
+$$
+$$
+v_{i} = embed_i * W_v \quad(1, d_{model})
+$$
+$$
+K = concat(k_{0}, k_{1}, &amp;hellip;, k_{i})  \quad(i+1, d_{model})
+$$
+$$
+Attn = softmax(q_{i} * K^T / \sqrt{d_{model}}) \quad(1, i+1)
+$$
+$$
+Output = Attn * [v_{0}, v_{1}, &amp;hellip;, v_{i}]  \quad(1, d_{model})
+$$&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

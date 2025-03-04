@@ -1,1 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Blog on Hxx'Log</title><link>https://yourusername.github.io/tags/blog/</link><description>Recent content in Blog on Hxx'Log</description><generator>Hugo -- 0.145.0</generator><language>en-us</language><lastBuildDate>Mon, 03 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://yourusername.github.io/tags/blog/index.xml" rel="self" type="application/rss+xml"/><item><title>My First Post</title><link>https://yourusername.github.io/posts/first-test-post/</link><pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate><guid>https://yourusername.github.io/posts/first-test-post/</guid><description>&lt;p>Used for testinig, nothing interesting here.&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Blog on Hxx&#39;Log</title>
+    <link>http://localhost:55338/tags/blog/</link>
+    <description>Recent content in Blog on Hxx&#39;Log</description>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 03 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:55338/tags/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>My First Post</title>
+      <link>http://localhost:55338/posts/first-test-post/</link>
+      <pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:55338/posts/first-test-post/</guid>
+      <description>&lt;p&gt;Used for testinig, nothing interesting here.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

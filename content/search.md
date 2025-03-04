@@ -1,5 +1,8 @@
-+++
-date = '2025-03-03T11:15:57-05:00'
-draft = true
-title = 'Search'
-+++
+---
+title: "Search" # in any language you want
+layout: "search" # necessary for search
+# url: "/archive"
+# description: "Description for Search"
+summary: "search"
+placeholder: "Type to search..."
+---

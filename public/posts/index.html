@@ -159,7 +159,7 @@
 To summarize, in auto-regressive language model,when generating a new token, all its previous tokens are fed into the attention layer for computation. In an attention layer, denote the text input/generation sequence as $X$, where as $i$ th token is $x_i$. When in step $i$, we are predicting $X_i$, the formula is: $$ q_{i} = embed_i * W_q \quad(1, d_{model}) $$ $$ k_{i} = embed_i * W_k \quad(1, d_{model}) $$ $$ v_{i} = embed_i * W_v \quad(1, d_{model}) $$ $$ K = concat(k_{0}, k_{1}, …, k_{i}) \quad(i&#43;1, d_{model}) $$ $$ Attn = softmax(q_{i} * K^T / \sqrt{d_{model}}) \quad(1, i&#43;1) $$ $$ Output = Attn * [v_{0}, v_{1}, …, v_{i}] \quad(1, d_{model}) $$
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-03-03 00:00:00 +0000 UTC'>March 3, 2025</span>&nbsp;·&nbsp;6 min&nbsp;·&nbsp;hxx</footer>
+  <footer class="entry-footer"><span title='2025-03-03 00:00:00 +0000 UTC'>March 3, 2025</span>&nbsp;·&nbsp;8 min&nbsp;·&nbsp;hxx</footer>
   <a class="entry-link" aria-label="post link to KV Cache Explained" href="http://localhost:1313/posts/kv-cache/"></a>
 </article>
     </main>

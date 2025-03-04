@@ -130,8 +130,8 @@ $$
 | 4000 | $8.08 \times 10^{14}$ | $2.83 \times 10^{12}$ | 99.65% |
 | 8000 | $3.23 \times 10^{15}$ | $5.66 \times 10^{12}$ | 99.82% |
 
-### Example run using KV Cache
-Last not least, we can test the effectiveness of KV Cache using huggingface's transformer library.
+### Test KV Cache in Huggingface's transformers
+We can test the effectiveness of KV Cache using [huggingface's transformers](https://github.com/huggingface/transformers/tree/main).
 ```python 
 def test_transformer_kv_cache(model_name="gpt2", prompt="Hello, I'm a language model", 
                              num_new_tokens=50, num_runs=5, use_gpu=False):
@@ -209,4 +209,134 @@ Results summary:
 - With KV cache: 8.3611 seconds
 - Speedup factor: 5.18x
 - Time reduction: 80.70%
+```
+
+### A brief peek into transformer's KV Cache implementation
+To better understand KV Cache, we can look at the transformer's KV Cache implementation.
+
+Let's use GPT2 as an example. 
+The `GPT2Attention.forward` takes a `use_cache` boolean argument, it will return current KV matriices if `use_cache=True`.
+
+```python
+#src/transformers/models/gpt2/modeling_gpt2.py
+class GPT2Attention(nn.Module):
+    def forward(...,   use_cache: Optional[bool] = False):
+        ...
+        query_states, key_states, value_states = self.c_attn(hidden_states).split(self.split_size, dim=2)
+        if use_cache is True:
+            present = (key_states, value_states)
+        else:
+            present = None
+        
+        outputs = (attn_output, present)
+        if output_attentions:
+            outputs += (attn_weights,)
+
+        return outputs  # a, present, (attentions)
+```
+
+The `GPT2Block` class does similar things, then `GPT2Model.forward` will output the KV matrics for all layers.
+```python
+#src/transformers/models/gpt2/modeling_gpt2.py
+class GPT2Model(GPT2PreTrainedModel):
+    def __init__(self):
+        self.h = nn.ModuleList([GPT2Block(config, layer_idx=i) for i in range(config.num_hidden_layers)])
+
+    def forward(..., past_key_values: Optional[Tuple[Tuple[torch.Tensor]]] = None,
+use_cache: Optional[bool] = False):
+        ...
+        # presents is used to store KV matrics for all layers.
+        presents = () if use_cache else None
+        for i in range(len(self.h)):
+            # Get previous KV matrics from input.
+            block, layer_past = self.h[i], past_key_values[i]
+            outputs = block(input_ids, layer_past=layer_past, use_cache=use_cache)
+            if use_cache is True:
+                presents = presents + (outputs[1],)
+        
+        return BaseModelOutputWithPastAndCrossAttentions(
+            last_hidden_state=hidden_states,
+            past_key_values=presents,
+            hidden_states=all_hidden_states,
+            attentions=all_self_attentions,
+            cross_attentions=all_cross_attentions,
+        )
+```
+
+The KV Cache in `past_key_values` of `GPT2Model.forward` is a `BaseModelOutputWithPastAndCrossAttentions`. It's of shape `(num_layers, 2)`, where the first dimension corresponds to the layer index and the second dimension is `key` at index 0 and `value` at index 1. Then each tensor is of shape `(batch_size, num_heads, seq_len, head_dim)`.
+
+During generation, a `DynamicCache` instance is created in `GenerationMixin`.
+
+```python
+#/src/transformers/src/transformers/generation/utils.py
+class GenerationMixin:
+    ...
+    def _prepare_cache_for_generation(self, model_kwargs: Dict[str, Any]):
+        ...
+        cache_name = "past_key_values"
+        model_kwargs[cache_name] = DynamicCache()
+
+#src/transformers/cache_utils.py
+class DynamicCache(Cache):
+    def __init__(self):
+        self._seen_tokens = 0  # Used in `generate` to keep tally of how many tokens the cache has seen
+        self.key_cache: List[torch.Tensor] = []
+        self.value_cache: List[torch.Tensor] = []
+    
+    def update(
+        self,
+        key_states: torch.Tensor,
+        value_states: torch.Tensor,
+        layer_idx: int,
+        cache_kwargs: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        # Update the number of seen tokens on layer 0.
+        if layer_idx == 0:
+            self._seen_tokens += key_states.shape[-2]
+
+        # Update the cache
+        if key_states is not None:
+            # Initialization phase, the layer cache not there yet.
+            if len(self.key_cache) <= layer_idx:
+                ...
+                self.key_cache.append(key_states)
+                self.value_cache.append(value_states)
+            else:
+                # Otherwise, only append current key and value to the cache.
+                self.key_cache[layer_idx] = torch.cat([self.key_cache[layer_idx], key_states], dim=-2)
+                self.value_cache[layer_idx] = torch.cat([self.value_cache[layer_idx], value_states], dim=-2)
+
+        return self.key_cache[layer_idx], self.value_cache[layer_idx]
+
+    @classmethod
+    def from_legacy_cache(cls, past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None) -> "DynamicCache":
+        """Converts a cache in the legacy cache format into an equivalent `DynamicCache`. """
+        cache = cls()
+        if past_key_values is not None:
+            for layer_idx in range(len(past_key_values)):
+                key_states, value_states = past_key_values[layer_idx]
+                cache.update(key_states, value_states, layer_idx)
+        return cache
+```
+
+Then the KV Cache is loaded and used for generation in `_sample`:
+```python
+src/transformers/generation/utils.py
+class GenerationMixin:
+    ...
+    def _sample(self, ...):
+        ...
+        while self._has_unfinished_sequences():
+            # Prepare KV Cache is in prepare_inputs_for_generation
+            model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)
+            outputs = model_forward(**model_inputs, return_dict=True)
+        ...
+        return GenerateDecoderOnlyOutput(
+                    sequences=input_ids,
+                    scores=scores,
+                    logits=raw_logits,
+                    attentions=decoder_attentions,
+                    hidden_states=decoder_hidden_states,
+                    past_key_values=model_kwargs.get("past_key_values"),
+                )
 ```

@@ -2,7 +2,7 @@
 title: "KV Cache Explained"
 date: 2025-03-03
 ShowToc: true
-TocOpen: true
+TocOpen: false
 tags: ["vllm", "KV Cache", "transformer"]
 ---
 

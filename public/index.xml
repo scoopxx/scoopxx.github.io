@@ -9,6 +9,15 @@
     <lastBuildDate>Thu, 10 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://scoopxx.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>About</title>
+      <link>https://scoopxx.github.io/about/</link>
+      <pubDate>Thu, 10 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>https://scoopxx.github.io/about/</guid>
+      <description>&lt;p&gt;Hi, welcome to my personal blog!&lt;/p&gt;
+&lt;p&gt;My name is Hao, but I go by &lt;code&gt;hxx&lt;/code&gt; online. I am a Software Engineer/Machine Learning Engineer by profession, with a broad curiosity about everything—from technical topics like LLM and MLSys to non-technical ones like economics and general science.&lt;/p&gt;
+&lt;p&gt;I started this blog in 2025, inspired by Paul Graham&amp;rsquo;s &lt;a href=&#34;https://www.paulgraham.com/writes.html&#34;&gt;&amp;ldquo;Writes and Write-Nots&amp;rdquo;&lt;/a&gt; article and Lilian Weng&amp;rsquo;s &lt;a href=&#34;https://lilianweng.github.io/&#34;&gt;blog&lt;/a&gt;. Here, I&amp;rsquo;ll document what I learn, primarily about ML/LLM, and occasionally share thoughts from non-fiction reading as well.&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>Introduction to Reinforcement Learning with Cliff Walking</title>
       <link>https://scoopxx.github.io/posts/rl-intro/</link>
       <pubDate>Thu, 10 Apr 2025 00:00:00 +0000</pubDate>

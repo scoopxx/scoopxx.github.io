@@ -2,7 +2,7 @@
 title: "Introduction to Reinforcement Learning with Cliff Walking"
 date: 2025-04-10
 ShowToc: true
-TocOpen: true
+TocOpen: false
 tags: ["Reinforcement Learning", "Monte Carlo", "Dynamic Programming", "Temporal Difference"]
 ---
 

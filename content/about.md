@@ -1,8 +1,7 @@
-+++
-date = '2025-03-03T11:16:06-05:00'
-draft = true
-title = 'About'
-+++
+---
+date: '2025-04-10'
+title: 'About'
+---
 
 Hi, welcome to my personal blog!
 

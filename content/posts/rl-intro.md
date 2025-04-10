@@ -1,69 +1,74 @@
 ---
-title: "Introduction to Reinforcement Learning"
-date: 2025-03-03
+title: "An Introduction to Reinforcement Learning using Cliff Walking Problem"
+date: 2025-04-10
 draft: true
 ShowToc: true
 TocOpen: true
-tags: ["Reinforcement Learning"]
+tags: ["Reinforcement Learning", "Monte Carlo", "Dynamic Programming", "Temporal Difference"]
 ---
 
-## 1. Intuition
-I've been interested in Reinforcement Learning (RL) for a while, especially following the recent advancements in LLM post-training using RL. However, the mathematical concepts and various notions used in RL differ significantly from those in supervised learning, which can feel strange or confusing for beginners like myself. For instance, in traditional machine learning, we typically discuss `model`, `data`, and `loss function`. In contrast, RL introduces terms like `on-policy`, `reward`, `model-free`, and `agent`.
+## 1. Getting Started with Reinforcement Learning
 
-Recently, I finally found some spare time to delve into RL, and fortunately, Richard Sutton's book, *Reinforcement Learning: An Introduction*, is surprisingly intuitive, even for RL beginners. I want to summarize and share my learnings here.
+I've been fascinated by Reinforcement Learning (RL) for some time, particularly after seeing its recent successes in refining Large Language Models (LLMs) through post-training. However, diving into RL can feel like entering a different world compared to supervised learning. The core concepts, mathematical notation, and terminology—terms like `on-policy`, `off-policy`, `reward`, `value function`, `model-free`, and `agent`—often seem unfamiliar and initially confusing for newcomers like me, who are more accustomed to the standard machine learning vocabulary of `model`, `data`, and `loss function`.
 
-In this article, I aim to explain some of the basic concepts and elements of RL. I will address the RL problem of `cliff walking` using three classes of methods: 1. Dynamic Programming, 2. Monte Carlo Methods, and 3. Temporal-Difference Learning. This discussion primarily covers content from chapters 1-6 of Sutton & Barto's book.
+Recently, I dedicated time to exploring RL more deeply. I was pleasantly surprised to find Richard Sutton and Andrew Barto's book, *Reinforcement Learning: An Introduction*, remarkably accessible, even for beginners. This post aims to summarize and share some fundamental concepts I've learned.
 
-## 2. Introduction of Reinforcement Learning
+In this article, we'll cover the basic elements of RL and explore the `Cliff Walking` problem—a classic RL task—using three foundational approaches:
+1.  **Dynamic Programming (DP)**
+2.  **Monte Carlo (MC) Methods**
+3.  **Temporal-Difference (TD) Learning**
 
-Why is RL necessary when we already have supervised and unsupervised learning? How does RL differ from these methods?
+This discussion is primarily based on Chapters 1 through 6 of Sutton & Barto's book.
 
-According to [Wikipedia](https://en.wikipedia.org/wiki/Machine_learning), **Machine Learning** involves statistical algorithms that can learn from data and generalize to unseen data. Suppose we have data $X$ and its training sample $x_i$; we aim to learn the distribution of $X$.
+## 2. What is Reinforcement Learning?
 
-- In supervised learning, the data consists of pairs $<x_i, y_i>$, and we aim to learn the distribution $p(y | x)$. For example, in image classification, given an image $x$, we predict its label $y$. Viewing GPT as a special case of supervised learning, it predicts the next token given a text sequence's previous tokens.
+With established paradigms like supervised and unsupervised learning, why do we need RL? How does it stand apart?
 
-- In unsupervised learning, the data consists of input features $x_i$ without associated labels. The goal is to learn the underlying structure or distribution of the data. Unsupervised learning is used when we want to explore the data's inherent patterns without predefined categories.
+**Machine Learning**, as defined by [Wikipedia](https://en.wikipedia.org/wiki/Machine_learning), centers on algorithms that learn patterns from data ($X$) and generalize to new, unseen data. The goal is often to understand the underlying distribution of $X$ or predict outcomes based on it.
 
-- In reinforcement learning, the input $x$ is dynamic and evolves over time, unlike in supervised learning where $x_i$ and $y_i$ are static pairs, or in unsupervised learning where we only deal with $x_i$. Reinforcement learning focuses on learning a policy $\pi(a | s)$ that maps situations (states) to actions through direct interaction with the environment over time. This temporal aspect is crucial because the agent's actions influence future states and rewards.
+-   **Supervised Learning**: Learns from labeled data, typically pairs of input features and corresponding outputs $<x_i, y_i>$. The objective is to learn a mapping function or the conditional probability distribution $p(y | x)$. Examples include image classification (predicting a label $y$ for an image $x$) and sequence prediction tasks like those performed by GPT models (predicting the next token based on previous tokens).
 
-For example, consider a self-driving car navigating through traffic. In this scenario, the car must continuously decide on actions (accelerate, brake, turn) based on the current state (traffic conditions, road layout). Supervised learning would struggle here because it requires predefined labels for each possible scenario, which is impractical. Reinforcement learning, however, allows the car to learn optimal driving strategies by interacting with the environment and receiving feedback (rewards) based on its actions.
+-   **Unsupervised Learning**: Works with unlabeled data, consisting only of input features $x_i$. The goal is to uncover hidden structures, patterns, or distributions within the data itself, without predefined categories or outcomes. Clustering and dimensionality reduction are common examples.
 
-### 2.1 Components of RL
+-   **Reinforcement Learning**: Differs significantly because it deals with learning optimal behaviors through interaction within a dynamic environment over time. Unlike supervised learning with static $<x_i, y_i>$ pairs or unsupervised learning focusing solely on $x_i$, RL involves an **agent** learning a **policy** $\\pi(a | s)$. This policy maps situations (**states**, $s$) to **actions** ($a$). The agent learns by receiving feedback (**rewards**) from the **environment** based on its actions, influencing future states and subsequent rewards. The temporal dimension and the agent's active role in shaping its experience are key distinctions.
 
-Reinforcement learning models interactions in games or strategies. There are two entities in an RL system:
+Consider a self-driving car navigating traffic. The car (agent) must constantly make decisions (accelerate, brake, turn - actions) based on its current situation (traffic, road conditions - state). Supervised learning struggles here because creating labeled data for every conceivable driving scenario is impractical. RL provides a framework for the car to learn effective driving strategies by directly interacting with its environment (simulated or real) and learning from the consequences (rewards or penalties) of its actions.
+
+### 2.1 Core Components of RL
+
+RL problems model the interaction between two main entities:
 
 ![Agent Environment Interaction](/images/ae1.png)
 
-- **Agent**: The learner and decision-maker.
-- **Environment**: Everything outside the agent that it interacts with.
+-   **Agent**: The learner and decision-maker. It perceives the environment's state and chooses actions.
+-   **Environment**: Everything external to the agent with which it interacts. It responds to the agent's actions by changing its state and providing rewards.
 
-There are three types of interactions between the agent and environment:
-- **Action**: An action the agent takes to interact with the environment.
-- **State**: A representation of the environment, altered by actions.
-- **Reward**: The environment's response to the agent based on its state.
+The interaction unfolds through a sequence of discrete time steps:
 
-A sequence of interactions is:
-- At time $t$, the environment's state is $s_t$, providing reward $r_t$.
-- Based on $s_t$ and $r_t$, the agent takes action $a_t$.
-- As a result of $a_t$, the state changes to $s_{t+1}$, providing reward $r_{t+1}$.
+1.  At time $t$, the agent observes the environment's state $s_t$.
+2.  Based on $s_t$, the agent selects an action $a_t$ according to its policy.
+3.  The environment transitions to a new state $s_{t+1}$ as a result of action $a_t$.
+4.  The environment provides a reward $r_{t+1}$ to the agent, indicating the immediate consequence of the transition.
 
-The goal of an RL system is to learn a strategy that enables the agent to make the best action at each step to maximize rewards. An agent is characterized by three components:
+This cycle repeats. The **goal** of the RL agent is typically to learn a policy that maximizes the **cumulative reward** over the long run.
 
-- **Policy**: The strategy the agent uses to determine its next action.
-- **Value Function**: A function the agent uses to evaluate its current state.
-- **Model**: The way the environment interacts with the agent, defining how the environment operates.
+An RL agent's behavior and learning process are often characterized by three key components:
 
-#### 2.1.1 Policy
+-   **Policy ($\pi$)**: The agent's strategy or behavior function. It dictates how the agent chooses actions based on the observed state. $a_t \sim \pi(\cdot|s_t)$.
+-   **Value Function ($V$ or $Q$)**: A prediction of future rewards. It estimates how good it is for the agent to be in a particular state ($V(s)$) or to take a specific action in a state ($Q(s, a)$), assuming the agent follows a certain policy thereafter. Value functions are crucial for evaluating policies and guiding action selection towards maximizing cumulative reward.
+-   **Model (Optional)**: The agent's internal representation of how the environment works. A model predicts what the next state and reward will be given a current state and action. $P(s_{t+1}, r_{t+1} | s_t, a_t)$. Agents that use a model are called **model-based**, while those that learn directly from experience without building an explicit model are **model-free**.
 
-A policy maps the current state $s_t$ to action $a_t$. It can be deterministic or stochastic:
+#### 2.1.1 Policy ($\pi$)
 
-- **Stochastic Policy**: The result is a distribution from which the agent samples its action.
+The policy defines the agent's way of behaving at a given time. Mathematically, it's a mapping from perceived states to actions to be taken when in those states.
 
-  $\pi(a_{t} | s_{t}) = p(a = a_t | s=s_t)$
+-   **Stochastic Policy**: Outputs a probability distribution over actions. The agent samples an action from this distribution.
+    $\pi(a | s) = P(A_t = a | S_t = s)$
+    This is common during learning to encourage exploration.
 
-- **Deterministic Policy**: The result is a specific action; for a given state, the agent executes a specific action.
-
-  $a_{t} = \text{argmax}\ \pi(a|s_t)$
+-   **Deterministic Policy**: Directly outputs a specific action for each state.
+    $a_t = \pi(s_t)$
+    Often, the goal is to learn an optimal deterministic policy.
 
 #### 2.1.2 Value Function
 
@@ -238,17 +243,19 @@ A decision process has the **Markov Property** if its next state and reward depe
 
 ### 4.1.2 Bellman Optimal Function
 
-The Bellman optimality equation defines the optimal value function as:
+The Bellman optimality equation defines the optimal value function as: 
 $$
-V^{*}(s) = \max V_\pi(s)
+V^*(s) = \max V_\pi(s)
 $$
+
 Here, we search for a policy $\pi$ that maximizes the value of state $V$. The resulting policy is our optimal policy.
 $$
-\pi^{*}(s) = \arg\max V_\pi(s)
+\pi^*(s) = argmax V_\pi(s)
 $$
+
 For each state $s$, we search over its possible actions to maximize the value:
 $$
-\pi^{*}(a | s) = 1, \text{ if } a = \arg\max Q^*(s, a)
+\pi^*(a | s) = 1, if\ a = argmax\ Q(s, a)
 $$
 
 Dynamic programming utilizes these equations to iteratively update the value function and improve the policy until convergence, ensuring that the policy becomes optimal.
@@ -320,7 +327,7 @@ def value_iteration_train(env, gamma=0.9, tolerance=1e-6):
 - The training iteration stops when the difference between two value functions is `<tolerance`.
 - We return the `V` and `policy` data during training for evaluation purposes.
 
-##### 4.2.3 Result and Visualization
+##### 4.2.2.3 Result and Visualization
 We run training using `gamma=0.9`, and it converges in 15 epochs.
 ```python
 dp_progress = value_iteration_train(env, gamma=0.9, tolerance=1e-6)
@@ -417,18 +424,22 @@ def policy_improve(env, V, policy, gamma=0.9):
     policy_stable = True
     for i in range(env.height):
         for j in range(env.width):
-            if (i, j) not in env.cliff and (i, j) != env.end:
-                values = []
-                for a in range(4):
-                    (i_new, j_new), reward = env.step(i, j, a)
-                    values.append(V[(i_new, j_new)] * gamma + reward)
-                
-                max_val = np.max(values)
-                best_actions = [a for a, v in enumerate(values) if v == max_val]
-                
-                if set(best_actions) != set(policy[(i, j)]):
-                    policy_stable = False
-                policy_new[(i, j)] = best_actions
+            current_state = (i, j)
+            # Skip cliff cells and the terminal goal state
+            if current_state in env.cliff or current_state == env.end:
+                continue
+
+            action_values = []
+            for a in range(4):
+                (i_new, j_new), reward = env.step(i, j, a)
+                action_values.append(V[(i_new, j_new)] * gamma + reward)
+            
+            max_val = np.max(action_values)
+            best_actions = [a for a, v in enumerate(action_values) if v == max_val]
+            
+            if set(best_actions) != set(policy[(i, j)]):
+                policy_stable = False
+            policy_new[(i, j)] = best_actions
     return policy_new, policy_stable
 ```
 - The `policy_improve` is a one-step optimization, it takes in the current value function `V`, picked the `argmax` action to update the policy, it also takes in the current policy `policy` to compare whether there is any change between the two policies. It returns both the updated policy `policy_new` and a boolean indicating whether the policy changed during optimization.
@@ -473,7 +484,9 @@ We also visualize the value function and policy in epochs `1, 3, 5`:
 ![Policy Iteration Visualization](/images/CliffWalking-04-08-2025_02_49_PM.png)
 
 
-## 6. Monte-Carlo Methods
+## 5. Monte-Carlo Methods
+### 5.1 Introduction
+
 It's nice that we solved the cliff walking problem with DP methods, and what's more? Remember in DP we assumed full knowledge of the environment - specifically:
 - The transition probability: $P(s_{t+1} | s_t, a_t)$
 - The reward function : $r(s_{t+1}, a_t, s_t)$
@@ -486,7 +499,7 @@ Then the agent needs to interact with the environment to generate **episodes** (
 
 Compare the two methods, DP is like a **planner** who knows the full map and computes the best path. Monte-Carlo is like an **explorer** that tries different routes and keeps optimizing the policy.
 
-### 6.1 Interaction Environment
+### 5.2 Interaction Environment
 We first need to change the `CliffWalk` environment to mimic an interaction environment.
 
 ```python
@@ -527,10 +540,10 @@ Compare the new implementation of `step` function with the previous one:
 - We are forbidden to compute the state and reward for any $<state, action>$ now. The agent has to reach a specific $s_t$ and take an $a_t$, call `step` to finally get the $s_{t+1}, r_t$ from interaction.
 - The `step` function returns a boolean variable `done` indicating whether the agent reached the `goal` grid
 
-### 6.2 Monte-Carlo Simulation
+### 5.3 Monte-Carlo Simulation
 Monte Carlo (MC) methods learn from complete episodes of interaction with the environment. The core idea is to estimate the value of a $<state, action>$ pair by averaging the total return observed after visiting a state across multiple episodes.
 
-### 6.2.1 $\epsilon$-search algorithm
+#### 5.3.1 $\epsilon$-search algorithm
 In RL systems, it's very common to face the exploration vs exploitation dilemma:
 - **Exploitation**: Pick the best known action so far (greedy)
 - **Exploration**: Try other actions to discover potentially better ones
@@ -539,7 +552,7 @@ If the agent always acts greedily, it may get stuck in suboptimal paths, without
 - **Exploration**: With probability $\epsilon$, choose a random action.
 - **Exploitation**: With probability $1 - \epsilon$, choose the action with the highest value: $a = argmax\ Q(s, a)$
 
-### 6.2.2 Monte-Carlo method in Cliff Walking
+#### 5.3.2 Monte-Carlo method in Cliff Walking
 - Step 0, Initialization:
     - Initialize a random value function: $Q(s, a)$
     - Initialize an $\epsilon$-greedy policy
@@ -553,8 +566,8 @@ If the agent always acts greedily, it may get stuck in suboptimal paths, without
     - The new policy is the $\epsilon$-greedy policy with the updated value function $Q(s, a)$.
 - Repeat step 1-3 until the policy converges.
 
-### 6.3 Python Implementation of MC in Cliff Walking
-#### 6.3.1 $\epsilon$-greedy search
+#### 5.3.3 Python Implementation of MC in Cliff Walking
+##### 5.3.3.1 $\epsilon$-greedy search
 
 This function implements the $\epsilon$-search to pick the action, 
 
@@ -573,7 +586,7 @@ def epsilon_greedy(action_values, epsilon):
     return action
 ```
 
-#### 6.3.2 MC-Simulation
+##### 5.3.3.2 MC-Simulation
 This function simulates 1 episode of MC simulation.
 - At the beginning, `env.reset()` sets the agent to the `start` state.
 - `Q` is the Value table, with the key being the current location `(i, j)`, and the value being a list of size 4, the value at index `k` represents the value for action `k`.
@@ -596,7 +609,7 @@ def mc_simulation(env, Q, epsilon=0.1):
     return episode_data, done
 ```
 
-#### 6.3.3 Value Function Update
+##### 5.3.3.3 Value Function Update
 ```python
 def improve_policy(Q, returns, episode_data, gamma=0.9):
     # Compute reward
@@ -621,7 +634,7 @@ def improve_policy(Q, returns, episode_data, gamma=0.9):
 - `returns` is a dictionary, with the key being a `<state, action>` combination, and the value being a list that stores its expected reward in each episode.
 - For each episode, we traversed backwards, iteratively computing each state's value using the function: $G_t = r_t + \gamma * G_{t+1}$.
 
-#### 6.3.4 Monte-Carlo training
+##### 5.3.3.4 Monte-Carlo training
 Combining the previous steps, we can train the agent:
 ```python
 def monte_carlo_training(env, num_episodes=1000, gamma=0.9, epsilon=0.1):
@@ -645,7 +658,7 @@ def monte_carlo_training(env, num_episodes=1000, gamma=0.9, epsilon=0.1):
 - `Q` is initialized by giving equal weights to each action.
 - We set $\epsilon$ to decay over episodes, `epsilon = max(0.01, epsilon*0.99)`. In earlier episodes, the agent has no prior knowledge, so we encourage more exploration, then in later episodes focus more on exploitation.
 
-#### 6.3.5 Results and Visualizations
+##### 5.3.3.5 Results and Visualizations
 We run MC sampling for 5000 episodes:
 ```python
 progress_data = monte_carlo_training(env, num_episodes=5000, gamma=0.9, epsilon=0.3)
@@ -656,7 +669,9 @@ We can see the learned policy is not ideally the optimal shortest path, and the 
 - The $Q$ value function is averaged over episodes, an early cliff fall trace will drag the **average return** for those cliff-adjacent grids.
 - Also, we used $\epsilon$-greedy policy, so even in later episodes when the agent learned a good policy, they will still randomly explore and occasionally fall off the cliff in cliff-adjacent grids.
 
-## 7. Temporal-Difference Methods
+## 6. Temporal-Difference Methods
+### 6.1 Introduction
+
 In previous illustrations of Monte Carlo methods, it estimates the value function using complete episodes. While this is intuitively simple and unbiased, it's very sample-inefficient. The value function updates only happen at the end of episodes, learning can be slow—especially in environments with long or variable episode lengths. 
 
 Temporal-Difference (TD) methods address these limitations by updating value estimates after each time step using bootstrapped predictions, leading to faster and more stable learning.
@@ -681,7 +696,7 @@ $$
 - $\gamma$ is the discount factor
 - $\alpha$ is the single step learning rate
 
-### 7.1. SARSA
+### 6.2 SARSA
 SARSA is one of the most straightforward ways in TD-methods. The idea is intuitive, using next step's $Q(s_{t+1}, a_{t+1})$ to subtract current step's $Q(s_{t}, a_{t})$ as the TD error, and update value function.
 $$
 G(s_t) = r_{t+1} + \gamma\ Q(s_{t+1}, a_{t+1}) \newline
@@ -689,7 +704,7 @@ Q(s_{t}, a_{t}) \leftarrow Q(s_{t}, a_{t}) + \alpha \cdot (G(s_t) - Q(s_t, a_t))
 $$
 In every step, we need to get its current state $s_t$, action $a_t$, bootstrap one step forward, get the reward $r_{t+1}$, the new state $s_{t+1}$ and action $a_{t+1}$. In each step, we need the sequence of $<s_t, a_t, r_{t+1}, s_{t+1}, a_{t+1}>$, and this is why this method is called *SARSA*.
 
-### 7.1.1 SARSA method in Cliff Walking
+#### 6.2.1 SARSA method in Cliff Walking
 - Step 0, Initialization:
     - Initialize a random value function: $Q(s, a)$
     - Initialize an $\epsilon$-greedy policy
@@ -707,8 +722,8 @@ This looks very similar to SARSA, the only difference is:
 - We no longer need to sample $s_{t+1}$ in each step.
 - We used $max\ Q(s_{t+1})$ instead of $Q(s_{t+1}, a_{t+1})$ for value update.
 
-### 7.1.2 Python Implementation of SARSA
-#### 7.1.2.1 SARSA
+#### 6.2.2 Python Implementation of SARSA
+##### 6.1.2.1 SARSA
 ```python
 def sarsa_one_epoch(env, Q, gamma=0.9, epsilon=0.1, alpha=0.1):
     # Get init action
@@ -730,6 +745,8 @@ def sarsa_one_epoch(env, Q, gamma=0.9, epsilon=0.1, alpha=0.1):
     policy = defaultdict(int)
     for k, v in Q.items():
         best_actions = [a for a, i in enumerate(v) if i == np.max(v)]
+        
+        # Random pick among best actions
         policy[k] = best_actions
     return Q, policy
 ```
@@ -751,7 +768,7 @@ def td_sarsa_training(env, num_episodes=1000, gamma=0.9, epsilon=0.1, alpha=0.1)
 ```
 - Similar to that of Monte-Carlo methods, we used a decaying $\epsilon$ for action search, to encourage more exploration in early episodes and more exploitation in later episodes.
 
-#### 7.1.2.2 Visualization and Result
+##### 6.1.2.2 Visualization and Result
 We train SARSA for 10000 episodes, and visualize the result
 ```python
 sarsa_progress = td_sarsa_training(env, num_episodes=10000, gamma=0.9, epsilon=0.1, alpha=0.2)
@@ -762,7 +779,7 @@ The learned policy in `epoch=9999` is similar to that learned from MC methods, t
 
 - The agent used $\epsilon$-greedy search, so even the agent learned a good policy, its exploration nature may still lead to fall off in cliff-adjacent grids. So the agent learned to walk far away from the cliff, taking the constant cost of extra `-1` reward, to avoid a potential `-100` reward. 
 
-### 7.2 Q-Learning
+### 6.3 Q-Learning
 Let's recap the SARSA algorithm again, it used $\epsilon$-greedy search on $Q$ value functions for two purposes:
 1. **Planning**: Decide the action $a_{t+1}$ of the next step
 2. **Policy Update**: use the actual action $a_{t+1}$ to update the value function.
@@ -790,7 +807,7 @@ G(s_t) = r_{t+1} + \gamma\ \underset{a}{max}\ Q(s_{t+1}) \newline
 Q(s_{t}, a_{t}) \leftarrow Q(s_{t}, a_{t}) + \alpha \cdot (G(s_t) - Q(s_t, a_t))
 $$
 
-### 7.2.1 Q-Learning in Cliff Walking
+#### 6.3.1 Q-Learning in Cliff Walking
 - Step 0, Initialization:
     - Initialize a random value function: $Q(s, a)$
     - Initialize an $\epsilon$-greedy policy
@@ -807,7 +824,8 @@ This looks very similar to SARSA, the only difference is:
 - We no longer need to sample $s_{t+1}$ in each step.
 - We used $max\ Q(s_{t+1})$ instead of $Q(s_{t+1}, a_{t+1})$ for value update.
 
-### 7.2.2 Python Implementation of Q-Learning
+#### 6.3.2 Python Implementation of Q-Learning
+##### 6.3.2.1 Q-Learning
 ```python
 def q_learning_one_epoch(env, Q, gamma=0.9, epsilon=0.1, alpha=0.1):
     # Get init action
@@ -845,7 +863,7 @@ def q_learning_training(env, num_episodes=1000, gamma=0.9, epsilon=0.1, alpha=0.
     return progress_data
 ```
 
-#### 7.2.3 Visualization and Result
+##### 6.3.2.2 Visualization and Result
 Q-Learning converges faster than SARSA, we only trained 200 episodes.
 ```python
 q_learning_progress = q_learning_training(env, num_episodes=200, gamma=1.0, epsilon=0.1, alpha=0.2)
@@ -854,4 +872,30 @@ q_learning_progress = q_learning_training(env, num_episodes=200, gamma=1.0, epsi
 
 While SARSA found a **safe path** under randomness of $\epsilon$-greedy, Q-Learning found the shortest optimal path- It learns to hug off the cliff!
 
-## 8. Summary
+## 7. Summary 
+
+- **Model-Based vs. Model-Free**: Dynamic Programming (DP) is a model-based approach requiring full knowledge of the environment's dynamics. In contrast, Monte Carlo (MC) and Temporal-Difference (TD) methods are model-free, learning directly from interactions.
+
+- **On-Policy vs. Off-Policy**: SARSA is an on-policy method, meaning it evaluates and improves the policy that is used to make decisions. Q-Learning is off-policy, as it evaluates the optimal policy independently of the agent's actions.
+
+- **Exploration vs. Exploitation**: Reinforcement Learning (RL) faces the dilemma of choosing between exploring new actions to discover their effects and exploiting known actions to maximize reward. Techniques like $\epsilon$-greedy balance this trade-off.
+
+- **Bellman Equations**: Central to DP and TD methods, these equations provide the foundation for iteratively improving value functions and policies.
+
+- **Comparison of DP, MC, and TD**:
+  - **DP**: Requires a complete model of the environment and is computationally intensive but provides exact solutions.
+  - **MC**: Sample-based and learns from complete episodes, making it intuitive but potentially inefficient for long episodes.
+  - **TD**: Bootstrap-based, updating estimates at each step, offering a balance between DP's precision and MC's sampling.
+  - **Intuitive Comparison**: If Temporal-Difference methods require broader updates, they resemble Dynamic Programming, as DP considers all states for updates. Conversely, if TD methods require deeper updates, they resemble Monte Carlo methods, which rely on complete episodes for learning.
+
+
+### 7.1. What's More
+
+In the cliff walking problem, the state space is relatively small, consisting of only about 20 grid cells. This allows us to use tabular methods, where we store the value function, either $V(s)$ or $Q(s, a)$, in a table. However, in more complex problems like self-driving cars or Atari games, the state space becomes significantly larger. This complexity necessitates the use of parametrized methods, which employ function approximations, such as neural networks, to estimate value functions or policies.
+
+These advanced methods enable RL algorithms to handle complex, high-dimensional environments, paving the way for techniques like Deep Q-Learning and Policy Gradient methods. Such approaches are often employed in the post-training of large language models (LLMs).
+
+## 8. References
+- Sutton, R. S., & Barto, A. G. (2018). [*Reinforcement Learning: An Introduction (2nd ed.)*](http://www.incompleteideas.net/book/the-book-2nd.html). MIT Press.
+- Wang, Q., Yang, Y., & Jiang, J. (2022). [*Easy RL: Reinforcement Learning Tutorial*](https://github.com/datawhalechina/easy-rl). Posts & Telecom Press.
+

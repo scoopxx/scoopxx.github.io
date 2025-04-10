@@ -6,15 +6,15 @@
     <description>Recent content in Posts on Hxx&#39;Log</description>
     <generator>Hugo -- 0.145.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 03 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 10 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Introduction to Reinforcement Learning</title>
+      <title>An Introduction to Reinforcement Learning using Cliff Walking Problem</title>
       <link>http://localhost:1313/posts/rl-intro/</link>
-      <pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 10 Apr 2025 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/rl-intro/</guid>
-      <description>&lt;h2 id=&#34;1-intuition&#34;&gt;1. Intuition&lt;/h2&gt;
-&lt;p&gt;I&amp;rsquo;ve been interested in Reinforcement Learning (RL) for a while, especially following the recent advancements in LLM post-training using RL. However, the mathematical concepts and various notions used in RL differ significantly from those in supervised learning, which can feel strange or confusing for beginners like myself. For instance, in traditional machine learning, we typically discuss &lt;code&gt;model&lt;/code&gt;, &lt;code&gt;data&lt;/code&gt;, and &lt;code&gt;loss function&lt;/code&gt;. In contrast, RL introduces terms like &lt;code&gt;on-policy&lt;/code&gt;, &lt;code&gt;reward&lt;/code&gt;, &lt;code&gt;model-free&lt;/code&gt;, and &lt;code&gt;agent&lt;/code&gt;.&lt;/p&gt;</description>
+      <description>&lt;h2 id=&#34;1-getting-started-with-reinforcement-learning&#34;&gt;1. Getting Started with Reinforcement Learning&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;ve been fascinated by Reinforcement Learning (RL) for some time, particularly after seeing its recent successes in refining Large Language Models (LLMs) through post-training. However, diving into RL can feel like entering a different world compared to supervised learning. The core concepts, mathematical notation, and terminology—terms like &lt;code&gt;on-policy&lt;/code&gt;, &lt;code&gt;off-policy&lt;/code&gt;, &lt;code&gt;reward&lt;/code&gt;, &lt;code&gt;value function&lt;/code&gt;, &lt;code&gt;model-free&lt;/code&gt;, and &lt;code&gt;agent&lt;/code&gt;—often seem unfamiliar and initially confusing for newcomers like me, who are more accustomed to the standard machine learning vocabulary of &lt;code&gt;model&lt;/code&gt;, &lt;code&gt;data&lt;/code&gt;, and &lt;code&gt;loss function&lt;/code&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>KV Cache Explained</title>

@@ -1,6 +1,6 @@
 baseURL = "https://yourusername.github.io/"
 languageCode = "en-us"
-title = "Hxx'Log"
+title = "Log(hx)"
 theme = "PaperMod"
 
 enableEmoji = true  # This enables emoji shortcodes
@@ -10,7 +10,7 @@ enableEmoji = true  # This enables emoji shortcodes
   home = ["HTML", "RSS", "JSON"]
 
 [params]
-  title = "Hxx'Log"
+  title = "log(hx)"
   description = "Brain dump and share my learnings here."
   author = "hxx"
   
@@ -26,7 +26,7 @@ enableEmoji = true  # This enables emoji shortcodes
     
   [params.homeInfoParams]
     title = "Hi there! :wave:"
-    content = "Hi, welcome to my blog! I'm hxx, a SWE/MLE fascinated by how everything works. This blog is my space to dump my learnings, mostly on LLM, maybe other stuff too."
+    content = "Hi, welcome to my blog! I'm `hxx`, a SWE/MLE. This blog is my space to dump my learnings, mainly technical topics like LLM/MLSys, maybe other stuff too."
 
     # For search
   [params.fuseOpts]
@@ -42,9 +42,9 @@ enableEmoji = true  # This enables emoji shortcodes
     name = "github"
     url = "https://github.com/scoopxx"
   
-#   [[params.socialIcons]]
-#     name = "twitter"
-#     url = "https://twitter.com/yourusername"
+  [[params.socialIcons]]
+    name = "linkedin"
+    url = "https://www.linkedin.com/in/hx364/"
 
 
 # Main menu configuration
@@ -60,13 +60,7 @@ enableEmoji = true  # This enables emoji shortcodes
     name = "Tags"
     url = "/tags/"
     weight = 20
-  
-  [[menu.main]]
-    identifier = "categories"
-    name = "Categories"
-    url = "/categories/"
-    weight = 30
-    
+      
   [[menu.main]]
     identifier = "search"
     name = "Search"

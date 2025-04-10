@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Temporal Difference on Hxx&#39;Log</title>
+    <title>Temporal Difference on Log(hx)</title>
     <link>http://localhost:1313/tags/temporal-difference/</link>
-    <description>Recent content in Temporal Difference on Hxx&#39;Log</description>
+    <description>Recent content in Temporal Difference on Log(hx)</description>
     <generator>Hugo -- 0.145.0</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 10 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/temporal-difference/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>An Introduction to Reinforcement Learning using Cliff Walking Problem</title>
+      <title>Introduction to Reinforcement Learning with Cliff Walking</title>
       <link>http://localhost:1313/posts/rl-intro/</link>
       <pubDate>Thu, 10 Apr 2025 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/rl-intro/</guid>

@@ -1,5 +1,5 @@
 ---
-title: "An Introduction to Reinforcement Learning using Cliff Walking Problem"
+title: "Introduction to Reinforcement Learning with Cliff Walking"
 date: 2025-04-10
 draft: true
 ShowToc: true

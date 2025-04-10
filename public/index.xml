@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Hxx&#39;Log</title>
+    <title>Log(hx)</title>
     <link>http://localhost:1313/</link>
-    <description>Recent content on Hxx&#39;Log</description>
+    <description>Recent content on Log(hx)</description>
     <generator>Hugo -- 0.145.0</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 10 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>An Introduction to Reinforcement Learning using Cliff Walking Problem</title>
+      <title>Introduction to Reinforcement Learning with Cliff Walking</title>
       <link>http://localhost:1313/posts/rl-intro/</link>
       <pubDate>Thu, 10 Apr 2025 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/rl-intro/</guid>
@@ -21,7 +21,9 @@
       <link>http://localhost:1313/about/</link>
       <pubDate>Mon, 03 Mar 2025 11:16:06 -0500</pubDate>
       <guid>http://localhost:1313/about/</guid>
-      <description></description>
+      <description>&lt;p&gt;Hi, welcome to my personal blog!&lt;/p&gt;
+&lt;p&gt;My name is Hao, but I go by &lt;code&gt;hxx&lt;/code&gt; online. I am a Software Engineer/Machine Learning Engineer by profession, with a broad curiosity about everything—from technical topics like LLM and MLSys to non-technical ones like economics and general science.&lt;/p&gt;
+&lt;p&gt;I started this blog in 2025, inspired by Paul Graham&amp;rsquo;s &lt;a href=&#34;https://www.paulgraham.com/writes.html&#34;&gt;&amp;ldquo;Writes and Write-Nots&amp;rdquo;&lt;/a&gt; article and Lilian Weng&amp;rsquo;s &lt;a href=&#34;https://lilianweng.github.io/&#34;&gt;blog&lt;/a&gt;. Here, I&amp;rsquo;ll document what I learn, primarily about ML/LLM, and occasionally share thoughts from non-fiction reading as well.&lt;/p&gt;</description>
     </item>
     <item>
       <title>KV Cache Explained</title>

@@ -2,28 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/about/</loc>
-    <lastmod>2025-03-03T11:16:06-05:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/</loc>
-    <lastmod>2025-03-03T11:16:06-05:00</lastmod>
+    <loc>http://localhost:1313/tags/dynamic-programming/</loc>
+    <lastmod>2025-04-10T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/rl-intro/</loc>
-    <lastmod>2025-03-03T00:00:00+00:00</lastmod>
+    <lastmod>2025-04-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2025-04-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/monte-carlo/</loc>
+    <lastmod>2025-04-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2025-04-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/reinforcement-learning/</loc>
+    <lastmod>2025-04-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2025-04-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/temporal-difference/</loc>
+    <lastmod>2025-04-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/about/</loc>
+    <lastmod>2025-03-03T11:16:06-05:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/kv-cache/</loc>
     <lastmod>2025-03-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/kv-cache/</loc>
-    <lastmod>2025-03-03T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2025-03-03T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/reinforcement-learning/</loc>
-    <lastmod>2025-03-03T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/</loc>
     <lastmod>2025-03-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/transformer/</loc>

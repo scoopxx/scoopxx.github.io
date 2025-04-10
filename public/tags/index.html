@@ -59,7 +59,18 @@
 </noscript>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false},
+      {left: '\\[', right: '\\]', display: true}
+    ],
+    throwOnError: false
+  });
+"></script>
+
 
 </head>
 
@@ -139,6 +150,9 @@
 <ul class="terms-tags">
     <li>
         <a href="http://localhost:1313/tags/kv-cache/">KV Cache <sup><strong><sup>1</sup></strong></sup> </a>
+    </li>
+    <li>
+        <a href="http://localhost:1313/tags/reinforcement-learning/">Reinforcement Learning <sup><strong><sup>1</sup></strong></sup> </a>
     </li>
     <li>
         <a href="http://localhost:1313/tags/transformer/">transformer <sup><strong><sup>1</sup></strong></sup> </a>

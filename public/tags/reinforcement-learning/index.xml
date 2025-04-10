@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Reinforcement Learning on Hxx&#39;Log</title>
+    <link>http://localhost:1313/tags/reinforcement-learning/</link>
+    <description>Recent content in Reinforcement Learning on Hxx&#39;Log</description>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 03 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/reinforcement-learning/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Introduction to Reinforcement Learning</title>
+      <link>http://localhost:1313/posts/rl-intro/</link>
+      <pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/rl-intro/</guid>
+      <description>&lt;h2 id=&#34;intuition&#34;&gt;Intuition&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;ve been having interests in Reinforcement Learning(RL) for a while, especially after ChatGPT when everyone was talking about &lt;code&gt;RLHF&lt;/code&gt;, but often felt it&amp;rsquo;s too daunting for me to do some reading and dig into it. Recently I finally found some spare time to go through it, and fortunately the famous Richard Sutton&amp;rsquo;s &amp;lt;Reinforcement Learning: an Introduction&amp;gt; book is surprisingly intuitive even for RL beginners.&lt;/p&gt;
+&lt;p&gt;However, the mathematical notions used in RL is quite different from those used in supervised learning, and may felt weird or confusing for beginners just like me. As a reference, I will share and summarize my reading notes here.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -61,7 +61,18 @@
 </noscript>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false},
+      {left: '\\[', right: '\\]', display: true}
+    ],
+    throwOnError: false
+  });
+"></script>
+
 
 </head>
 
@@ -155,6 +166,26 @@
 </div>
 
     </footer>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Introduction to Reinforcement Learning
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Intuition I’ve been having interests in Reinforcement Learning(RL) for a while, especially after ChatGPT when everyone was talking about RLHF, but often felt it’s too daunting for me to do some reading and dig into it. Recently I finally found some spare time to go through it, and fortunately the famous Richard Sutton’s &lt;Reinforcement Learning: an Introduction&gt; book is surprisingly intuitive even for RL beginners.
+However, the mathematical notions used in RL is quite different from those used in supervised learning, and may felt weird or confusing for beginners just like me. As a reference, I will share and summarize my reading notes here.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-03 00:00:00 +0000 UTC'>March 3, 2025</span>&nbsp;·&nbsp;27 min&nbsp;·&nbsp;hxx</footer>
+  <a class="entry-link" aria-label="post link to Introduction to Reinforcement Learning" href="http://localhost:1313/posts/rl-intro/"></a>
 </article>
 
 <article class="post-entry"> 

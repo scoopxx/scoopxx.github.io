@@ -16,6 +16,15 @@
       <description></description>
     </item>
     <item>
+      <title>Introduction to Reinforcement Learning</title>
+      <link>http://localhost:1313/posts/rl-intro/</link>
+      <pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/rl-intro/</guid>
+      <description>&lt;h2 id=&#34;intuition&#34;&gt;Intuition&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;ve been having interests in Reinforcement Learning(RL) for a while, especially after ChatGPT when everyone was talking about &lt;code&gt;RLHF&lt;/code&gt;, but often felt it&amp;rsquo;s too daunting for me to do some reading and dig into it. Recently I finally found some spare time to go through it, and fortunately the famous Richard Sutton&amp;rsquo;s &amp;lt;Reinforcement Learning: an Introduction&amp;gt; book is surprisingly intuitive even for RL beginners.&lt;/p&gt;
+&lt;p&gt;However, the mathematical notions used in RL is quite different from those used in supervised learning, and may felt weird or confusing for beginners just like me. As a reference, I will share and summarize my reading notes here.&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>KV Cache Explained</title>
       <link>http://localhost:1313/posts/kv-cache/</link>
       <pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate>

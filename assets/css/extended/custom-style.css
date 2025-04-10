@@ -1,0 +1,19 @@
+/* Target only fenced code blocks - the ones using ``` */
+.post-content div.highlight,
+figure.highlight,
+.post-content pre.chroma {
+    background-color: #f8f8f8 !important; /* Light gray background */
+}
+
+.post-content div.highlight pre,
+figure.highlight pre,
+.post-content pre.chroma {
+    background-color: #f8f8f8 !important; /* Light gray background */
+}
+
+.post-content div.highlight pre code,
+figure.highlight pre code,
+.post-content pre.chroma code {
+    background-color: #f8f8f8 !important;
+    color: #24292e !important; /* Dark text for readability */
+}

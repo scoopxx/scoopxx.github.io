@@ -31,7 +31,7 @@ Output = Attn * [v_{0}, v_{1}, &hellip;, v_{i}]  \quad(1, d_{model})
 $$">
 <meta name="author" content="hxx">
 <link rel="canonical" href="http://localhost:1313/posts/kv-cache/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.45e028aa8ce0961349adf411b013ee39406be2c0bc80d4ea3fc04555f7f4611a.css" integrity="sha256-ReAoqozglhNJrfQRsBPuOUBr4sC8gNTqP8BFVff0YRo=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.519db25830472c2083527875996b96dafffe4841e99170caece374d56241122a.css" integrity="sha256-UZ2yWDBHLCCDUnh1mWuW2v/&#43;SEHpkXDK7ON01WJBEio=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -165,7 +165,7 @@ $$">
     <h1 class="post-title entry-hint-parent">
       KV Cache Explained
     </h1>
-    <div class="post-meta"><span title='2025-03-03 00:00:00 +0000 UTC'>March 3, 2025</span>&nbsp;·&nbsp;8 min&nbsp;·&nbsp;hxx
+    <div class="post-meta"><span title='2025-03-03 00:00:00 +0000 UTC'>March 3, 2025</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;hxx
 
 </div>
   </header> <div class="toc">
@@ -348,69 +348,137 @@ $$</p>
 </table>
 <h3 id="test-kv-cache-in-huggingfaces-transformers">Test KV Cache in Huggingface&rsquo;s transformers<a hidden class="anchor" aria-hidden="true" href="#test-kv-cache-in-huggingfaces-transformers">#</a></h3>
 <p>We can test the effectiveness of KV Cache using <a href="https://github.com/huggingface/transformers/tree/main">huggingface&rsquo;s transformers</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_transformer_kv_cache</span>(model_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;gpt2&#34;</span>, prompt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Hello, I&#39;m a language model&#34;</span>, 
-</span></span><span style="display:flex;"><span>                             num_new_tokens<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>, num_runs<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>, use_gpu<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>):
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> time
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> torch
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModelForCausalLM, AutoTokenizer
+<div class="highlight"><div style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#859900">def</span> <span style="color:#268bd2">test_transformer_kv_cache</span>(<span style="color:#268bd2">model_name</span>=<span style="color:#2aa198">&#34;gpt2&#34;</span>, <span style="color:#268bd2">prompt</span>=<span style="color:#2aa198">&#34;Hello, I&#39;m a language model&#34;</span>, 
+</span></span><span style="display:flex;"><span>                             <span style="color:#268bd2">num_new_tokens</span>=<span style="color:#2aa198;font-weight:bold">50</span>, <span style="color:#268bd2">num_runs</span>=<span style="color:#2aa198;font-weight:bold">5</span>, <span style="color:#268bd2">use_gpu</span>=<span style="color:#859900;font-weight:bold">False</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f;font-weight:bold">import</span> <span style="color:#268bd2">time</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f;font-weight:bold">import</span> <span style="color:#268bd2">torch</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f;font-weight:bold">from</span> <span style="color:#268bd2">transformers</span> <span style="color:#dc322f;font-weight:bold">import</span> <span style="color:#268bd2">AutoModelForCausalLM</span>, <span style="color:#268bd2">AutoTokenizer</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    device <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;cuda&#34;</span> <span style="color:#66d9ef">if</span> torch<span style="color:#f92672">.</span>cuda<span style="color:#f92672">.</span>is_available() <span style="color:#f92672">and</span> use_gpu <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#34;cpu&#34;</span>
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Using device: </span><span style="color:#e6db74">{</span>device<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">device</span> = <span style="color:#2aa198">&#34;cuda&#34;</span> <span style="color:#859900">if</span> <span style="color:#268bd2">torch</span>.<span style="color:#268bd2">cuda</span>.<span style="color:#268bd2">is_available</span>() <span style="color:#859900">and</span> <span style="color:#268bd2">use_gpu</span> <span style="color:#859900">else</span> <span style="color:#2aa198">&#34;cpu&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;Using device: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">device</span><span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>)
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Load model and tokenizer</span>
-</span></span><span style="display:flex;"><span>    model <span style="color:#f92672">=</span> AutoModelForCausalLM<span style="color:#f92672">.</span>from_pretrained(model_name)<span style="color:#f92672">.</span>to(device)
-</span></span><span style="display:flex;"><span>    tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(model_name)
+</span></span><span style="display:flex;"><span>    <span style="color:#93a1a1;font-style:italic"># Load model and tokenizer</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">model</span> = <span style="color:#268bd2">AutoModelForCausalLM</span>.<span style="color:#268bd2">from_pretrained</span>(<span style="color:#268bd2">model_name</span>).<span style="color:#268bd2">to</span>(<span style="color:#268bd2">device</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">tokenizer</span> = <span style="color:#268bd2">AutoTokenizer</span>.<span style="color:#268bd2">from_pretrained</span>(<span style="color:#268bd2">model_name</span>)
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Tokenize input</span>
-</span></span><span style="display:flex;"><span>    input_ids <span style="color:#f92672">=</span> tokenizer(prompt, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>)<span style="color:#f92672">.</span>input_ids<span style="color:#f92672">.</span>to(device)
-</span></span><span style="display:flex;"><span>    input_length <span style="color:#f92672">=</span> input_ids<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#93a1a1;font-style:italic"># Tokenize input</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">input_ids</span> = <span style="color:#268bd2">tokenizer</span>(<span style="color:#268bd2">prompt</span>, <span style="color:#268bd2">return_tensors</span>=<span style="color:#2aa198">&#34;pt&#34;</span>).<span style="color:#268bd2">input_ids</span>.<span style="color:#268bd2">to</span>(<span style="color:#268bd2">device</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">input_length</span> = <span style="color:#268bd2">input_ids</span>.<span style="color:#268bd2">shape</span>[<span style="color:#2aa198;font-weight:bold">1</span>]
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    results <span style="color:#f92672">=</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;with_kv_cache&#34;</span>: [],
-</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;without_kv_cache&#34;</span>: []
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">results</span> = {
+</span></span><span style="display:flex;"><span>        <span style="color:#2aa198">&#34;with_kv_cache&#34;</span>: [],
+</span></span><span style="display:flex;"><span>        <span style="color:#2aa198">&#34;without_kv_cache&#34;</span>: []
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Running inference with model: </span><span style="color:#e6db74">{</span>model_name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Input prompt: &#39;</span><span style="color:#e6db74">{</span>prompt<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; (Length: </span><span style="color:#e6db74">{</span>input_length<span style="color:#e6db74">}</span><span style="color:#e6db74"> tokens)&#34;</span>)
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Generating </span><span style="color:#e6db74">{</span>num_new_tokens<span style="color:#e6db74">}</span><span style="color:#e6db74"> new tokens, averaging over </span><span style="color:#e6db74">{</span>num_runs<span style="color:#e6db74">}</span><span style="color:#e6db74"> runs</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;Running inference with model: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">model_name</span><span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;Input prompt: &#39;</span><span style="color:#2aa198">{</span><span style="color:#268bd2">prompt</span><span style="color:#2aa198">}</span><span style="color:#2aa198">&#39; (Length: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">input_length</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> tokens)&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;Generating </span><span style="color:#2aa198">{</span><span style="color:#268bd2">num_new_tokens</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> new tokens, averaging over </span><span style="color:#2aa198">{</span><span style="color:#268bd2">num_runs</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> runs</span><span style="color:#2aa198">\n</span><span style="color:#2aa198">&#34;</span>)
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> use_kv_cache <span style="color:#f92672">in</span> [<span style="color:#66d9ef">False</span>, <span style="color:#66d9ef">True</span>]:
-</span></span><span style="display:flex;"><span>        cache_status <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;with&#34;</span> <span style="color:#66d9ef">if</span> use_kv_cache <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#34;without&#34;</span>
-</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Testing </span><span style="color:#e6db74">{</span>cache_status<span style="color:#e6db74">}</span><span style="color:#e6db74"> KV cache...&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">for</span> <span style="color:#268bd2">use_kv_cache</span> <span style="color:#859900">in</span> [<span style="color:#859900;font-weight:bold">False</span>, <span style="color:#859900;font-weight:bold">True</span>]:
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">cache_status</span> = <span style="color:#2aa198">&#34;with&#34;</span> <span style="color:#859900">if</span> <span style="color:#268bd2">use_kv_cache</span> <span style="color:#859900">else</span> <span style="color:#2aa198">&#34;without&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;Testing </span><span style="color:#2aa198">{</span><span style="color:#268bd2">cache_status</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> KV cache...&#34;</span>)
 </span></span><span style="display:flex;"><span>        
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> run <span style="color:#f92672">in</span> range(num_runs):
-</span></span><span style="display:flex;"><span>            start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">for</span> <span style="color:#268bd2">run</span> <span style="color:#859900">in</span> <span style="color:#cb4b16">range</span>(<span style="color:#268bd2">num_runs</span>):
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">start_time</span> = <span style="color:#268bd2">time</span>.<span style="color:#268bd2">time</span>()
 </span></span><span style="display:flex;"><span>            
-</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Generate using model.generate with appropriate use_cache setting</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">with</span> torch<span style="color:#f92672">.</span>no_grad():
-</span></span><span style="display:flex;"><span>                output <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>generate(
-</span></span><span style="display:flex;"><span>                    input_ids,
-</span></span><span style="display:flex;"><span>                    max_new_tokens<span style="color:#f92672">=</span>num_new_tokens,
-</span></span><span style="display:flex;"><span>                    use_cache<span style="color:#f92672">=</span>use_kv_cache,
-</span></span><span style="display:flex;"><span>                    do_sample<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,  <span style="color:#75715e"># Deterministic generation (greedy)</span>
-</span></span><span style="display:flex;"><span>                    pad_token_id<span style="color:#f92672">=</span>tokenizer<span style="color:#f92672">.</span>eos_token_id
+</span></span><span style="display:flex;"><span>            <span style="color:#93a1a1;font-style:italic"># Generate using model.generate with appropriate use_cache setting</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#859900">with</span> <span style="color:#268bd2">torch</span>.<span style="color:#268bd2">no_grad</span>():
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">output</span> = <span style="color:#268bd2">model</span>.<span style="color:#268bd2">generate</span>(
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">input_ids</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">max_new_tokens</span>=<span style="color:#268bd2">num_new_tokens</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">use_cache</span>=<span style="color:#268bd2">use_kv_cache</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">do_sample</span>=<span style="color:#859900;font-weight:bold">False</span>,  <span style="color:#93a1a1;font-style:italic"># Deterministic generation (greedy)</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">pad_token_id</span>=<span style="color:#268bd2">tokenizer</span>.<span style="color:#268bd2">eos_token_id</span>
 </span></span><span style="display:flex;"><span>                )
 </span></span><span style="display:flex;"><span>            
-</span></span><span style="display:flex;"><span>            elapsed <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time() <span style="color:#f92672">-</span> start_time
-</span></span><span style="display:flex;"><span>            results[<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>cache_status<span style="color:#e6db74">}</span><span style="color:#e6db74">_kv_cache&#34;</span>]<span style="color:#f92672">.</span>append(elapsed)
-</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  Run </span><span style="color:#e6db74">{</span>run<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>num_runs<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>elapsed<span style="color:#e6db74">:</span><span style="color:#e6db74">.4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> seconds&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">elapsed</span> = <span style="color:#268bd2">time</span>.<span style="color:#268bd2">time</span>() - <span style="color:#268bd2">start_time</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">results</span>[<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;</span><span style="color:#2aa198">{</span><span style="color:#268bd2">cache_status</span><span style="color:#2aa198">}</span><span style="color:#2aa198">_kv_cache&#34;</span>].<span style="color:#268bd2">append</span>(<span style="color:#268bd2">elapsed</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;  Run </span><span style="color:#2aa198">{</span><span style="color:#268bd2">run</span>+<span style="color:#2aa198;font-weight:bold">1</span><span style="color:#2aa198">}</span><span style="color:#2aa198">/</span><span style="color:#2aa198">{</span><span style="color:#268bd2">num_runs</span><span style="color:#2aa198">}</span><span style="color:#2aa198">: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">elapsed</span><span style="color:#2aa198">:</span><span style="color:#2aa198">.4f</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> seconds&#34;</span>)
 </span></span><span style="display:flex;"><span>        
-</span></span><span style="display:flex;"><span>        avg_time <span style="color:#f92672">=</span> sum(results[<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>cache_status<span style="color:#e6db74">}</span><span style="color:#e6db74">_kv_cache&#34;</span>]) <span style="color:#f92672">/</span> num_runs
-</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Average time </span><span style="color:#e6db74">{</span>cache_status<span style="color:#e6db74">}</span><span style="color:#e6db74"> KV cache: </span><span style="color:#e6db74">{</span>avg_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> seconds</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">avg_time</span> = <span style="color:#cb4b16">sum</span>(<span style="color:#268bd2">results</span>[<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;</span><span style="color:#2aa198">{</span><span style="color:#268bd2">cache_status</span><span style="color:#2aa198">}</span><span style="color:#2aa198">_kv_cache&#34;</span>]) / <span style="color:#268bd2">num_runs</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;Average time </span><span style="color:#2aa198">{</span><span style="color:#268bd2">cache_status</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> KV cache: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">avg_time</span><span style="color:#2aa198">:</span><span style="color:#2aa198">.4f</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> seconds</span><span style="color:#2aa198">\n</span><span style="color:#2aa198">&#34;</span>)
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Calculate speedup</span>
-</span></span><span style="display:flex;"><span>    avg_time_without_kv <span style="color:#f92672">=</span> sum(results[<span style="color:#e6db74">&#34;without_kv_cache&#34;</span>]) <span style="color:#f92672">/</span> num_runs
-</span></span><span style="display:flex;"><span>    avg_time_with_kv <span style="color:#f92672">=</span> sum(results[<span style="color:#e6db74">&#34;with_kv_cache&#34;</span>]) <span style="color:#f92672">/</span> num_runs
-</span></span><span style="display:flex;"><span>    speedup <span style="color:#f92672">=</span> avg_time_without_kv <span style="color:#f92672">/</span> avg_time_with_kv
-</span></span><span style="display:flex;"><span>    reduction_percentage <span style="color:#f92672">=</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> avg_time_with_kv <span style="color:#f92672">/</span> avg_time_without_kv) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#93a1a1;font-style:italic"># Calculate speedup</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">avg_time_without_kv</span> = <span style="color:#cb4b16">sum</span>(<span style="color:#268bd2">results</span>[<span style="color:#2aa198">&#34;without_kv_cache&#34;</span>]) / <span style="color:#268bd2">num_runs</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">avg_time_with_kv</span> = <span style="color:#cb4b16">sum</span>(<span style="color:#268bd2">results</span>[<span style="color:#2aa198">&#34;with_kv_cache&#34;</span>]) / <span style="color:#268bd2">num_runs</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">speedup</span> = <span style="color:#268bd2">avg_time_without_kv</span> / <span style="color:#268bd2">avg_time_with_kv</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">reduction_percentage</span> = (<span style="color:#2aa198;font-weight:bold">1</span> - <span style="color:#268bd2">avg_time_with_kv</span> / <span style="color:#268bd2">avg_time_without_kv</span>) * <span style="color:#2aa198;font-weight:bold">100</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Results summary:&#34;</span>)
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;- Without KV cache: </span><span style="color:#e6db74">{</span>avg_time_without_kv<span style="color:#e6db74">:</span><span style="color:#e6db74">.4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> seconds&#34;</span>)
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;- With KV cache: </span><span style="color:#e6db74">{</span>avg_time_with_kv<span style="color:#e6db74">:</span><span style="color:#e6db74">.4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> seconds&#34;</span>)
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;- Speedup factor: </span><span style="color:#e6db74">{</span>speedup<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">x&#34;</span>)
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;- Time reduction: </span><span style="color:#e6db74">{</span>reduction_percentage<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">%&#34;</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span>
-</span></span></code></pre></div><p>We run <code>GPT2</code> on Google Colab with a T4 GPU. The results are as follows:</p>
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">&#34;Results summary:&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;- Without KV cache: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">avg_time_without_kv</span><span style="color:#2aa198">:</span><span style="color:#2aa198">.4f</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> seconds&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;- With KV cache: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">avg_time_with_kv</span><span style="color:#2aa198">:</span><span style="color:#2aa198">.4f</span><span style="color:#2aa198">}</span><span style="color:#2aa198"> seconds&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;- Speedup factor: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">speedup</span><span style="color:#2aa198">:</span><span style="color:#2aa198">.2f</span><span style="color:#2aa198">}</span><span style="color:#2aa198">x&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">print</span>(<span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;- Time reduction: </span><span style="color:#2aa198">{</span><span style="color:#268bd2">reduction_percentage</span><span style="color:#2aa198">:</span><span style="color:#2aa198">.2f</span><span style="color:#2aa198">}</span><span style="color:#2aa198">%&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">return</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We run <code>GPT2</code> on Google Colab with a T4 GPU. The results are as follows:</p>
 <pre tabindex="0"><code>Using device: cuda
 Running inference with model: gpt2
 Input prompt: &#39;Hello, I&#39;m a language model&#39; (Length: 7 tokens)
@@ -425,117 +493,247 @@ Results summary:
 <p>To better understand KV Cache, we can look at the transformer&rsquo;s KV Cache implementation.</p>
 <p>Let&rsquo;s use GPT2 as an example.
 The <code>GPT2Attention.forward</code> takes a <code>use_cache</code> boolean argument, it will return current KV matriices if <code>use_cache=True</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#src/transformers/models/gpt2/modeling_gpt2.py</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GPT2Attention</span>(nn<span style="color:#f92672">.</span>Module):
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(<span style="color:#f92672">...</span>,   use_cache: Optional[bool] <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>):
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>        query_states, key_states, value_states <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>c_attn(hidden_states)<span style="color:#f92672">.</span>split(self<span style="color:#f92672">.</span>split_size, dim<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> use_cache <span style="color:#f92672">is</span> <span style="color:#66d9ef">True</span>:
-</span></span><span style="display:flex;"><span>            present <span style="color:#f92672">=</span> (key_states, value_states)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>            present <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+<div class="highlight"><div style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#93a1a1;font-style:italic">#src/transformers/models/gpt2/modeling_gpt2.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#859900">class</span> <span style="color:#cb4b16">GPT2Attention</span>(<span style="color:#268bd2">nn</span>.<span style="color:#268bd2">Module</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">def</span> <span style="color:#268bd2">forward</span>(...,   <span style="color:#268bd2">use_cache</span>: <span style="color:#268bd2">Optional</span>[<span style="color:#cb4b16">bool</span>] = <span style="color:#859900;font-weight:bold">False</span>):
+</span></span><span style="display:flex;"><span>        ...
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">query_states</span>, <span style="color:#268bd2">key_states</span>, <span style="color:#268bd2">value_states</span> = <span style="color:#268bd2">self</span>.<span style="color:#268bd2">c_attn</span>(<span style="color:#268bd2">hidden_states</span>).<span style="color:#268bd2">split</span>(<span style="color:#268bd2">self</span>.<span style="color:#268bd2">split_size</span>, <span style="color:#268bd2">dim</span>=<span style="color:#2aa198;font-weight:bold">2</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">if</span> <span style="color:#268bd2">use_cache</span> <span style="color:#859900">is</span> <span style="color:#859900;font-weight:bold">True</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">present</span> = (<span style="color:#268bd2">key_states</span>, <span style="color:#268bd2">value_states</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">present</span> = <span style="color:#859900;font-weight:bold">None</span>
 </span></span><span style="display:flex;"><span>        
-</span></span><span style="display:flex;"><span>        outputs <span style="color:#f92672">=</span> (attn_output, present)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> output_attentions:
-</span></span><span style="display:flex;"><span>            outputs <span style="color:#f92672">+=</span> (attn_weights,)
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">outputs</span> = (<span style="color:#268bd2">attn_output</span>, <span style="color:#268bd2">present</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">if</span> <span style="color:#268bd2">output_attentions</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">outputs</span> += (<span style="color:#268bd2">attn_weights</span>,)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> outputs  <span style="color:#75715e"># a, present, (attentions)</span>
-</span></span></code></pre></div><p>The <code>GPT2Block</code> class does similar things, then <code>GPT2Model.forward</code> will output the KV matrics for all layers.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#src/transformers/models/gpt2/modeling_gpt2.py</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GPT2Model</span>(GPT2PreTrainedModel):
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self):
-</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>h <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>ModuleList([GPT2Block(config, layer_idx<span style="color:#f92672">=</span>i) <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(config<span style="color:#f92672">.</span>num_hidden_layers)])
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">return</span> <span style="color:#268bd2">outputs</span>  <span style="color:#93a1a1;font-style:italic"># a, present, (attentions)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>GPT2Block</code> class does similar things, then <code>GPT2Model.forward</code> will output the KV matrics for all layers.</p>
+<div class="highlight"><div style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#93a1a1;font-style:italic">#src/transformers/models/gpt2/modeling_gpt2.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#859900">class</span> <span style="color:#cb4b16">GPT2Model</span>(<span style="color:#268bd2">GPT2PreTrainedModel</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">def</span> <span style="color:#268bd2">__init__</span>(<span style="color:#268bd2">self</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">self</span>.<span style="color:#268bd2">h</span> = <span style="color:#268bd2">nn</span>.<span style="color:#268bd2">ModuleList</span>([<span style="color:#268bd2">GPT2Block</span>(<span style="color:#268bd2">config</span>, <span style="color:#268bd2">layer_idx</span>=<span style="color:#268bd2">i</span>) <span style="color:#859900">for</span> <span style="color:#268bd2">i</span> <span style="color:#859900">in</span> <span style="color:#cb4b16">range</span>(<span style="color:#268bd2">config</span>.<span style="color:#268bd2">num_hidden_layers</span>)])
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(<span style="color:#f92672">...</span>, past_key_values: Optional[Tuple[Tuple[torch<span style="color:#f92672">.</span>Tensor]]] <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>,
-</span></span><span style="display:flex;"><span>use_cache: Optional[bool] <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>):
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># presents is used to store KV matrics for all layers.</span>
-</span></span><span style="display:flex;"><span>        presents <span style="color:#f92672">=</span> () <span style="color:#66d9ef">if</span> use_cache <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">None</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(self<span style="color:#f92672">.</span>h)):
-</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Get previous KV matrics from input.</span>
-</span></span><span style="display:flex;"><span>            block, layer_past <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>h[i], past_key_values[i]
-</span></span><span style="display:flex;"><span>            outputs <span style="color:#f92672">=</span> block(input_ids, layer_past<span style="color:#f92672">=</span>layer_past, use_cache<span style="color:#f92672">=</span>use_cache)
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> use_cache <span style="color:#f92672">is</span> <span style="color:#66d9ef">True</span>:
-</span></span><span style="display:flex;"><span>                presents <span style="color:#f92672">=</span> presents <span style="color:#f92672">+</span> (outputs[<span style="color:#ae81ff">1</span>],)
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">def</span> <span style="color:#268bd2">forward</span>(..., <span style="color:#268bd2">past_key_values</span>: <span style="color:#268bd2">Optional</span>[<span style="color:#268bd2">Tuple</span>[<span style="color:#268bd2">Tuple</span>[<span style="color:#268bd2">torch</span>.<span style="color:#268bd2">Tensor</span>]]] = <span style="color:#859900;font-weight:bold">None</span>,
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">use_cache</span>: <span style="color:#268bd2">Optional</span>[<span style="color:#cb4b16">bool</span>] = <span style="color:#859900;font-weight:bold">False</span>):
+</span></span><span style="display:flex;"><span>        ...
+</span></span><span style="display:flex;"><span>        <span style="color:#93a1a1;font-style:italic"># presents is used to store KV matrics for all layers.</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">presents</span> = () <span style="color:#859900">if</span> <span style="color:#268bd2">use_cache</span> <span style="color:#859900">else</span> <span style="color:#859900;font-weight:bold">None</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">for</span> <span style="color:#268bd2">i</span> <span style="color:#859900">in</span> <span style="color:#cb4b16">range</span>(<span style="color:#cb4b16">len</span>(<span style="color:#268bd2">self</span>.<span style="color:#268bd2">h</span>)):
+</span></span><span style="display:flex;"><span>            <span style="color:#93a1a1;font-style:italic"># Get previous KV matrics from input.</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">block</span>, <span style="color:#268bd2">layer_past</span> = <span style="color:#268bd2">self</span>.<span style="color:#268bd2">h</span>[<span style="color:#268bd2">i</span>], <span style="color:#268bd2">past_key_values</span>[<span style="color:#268bd2">i</span>]
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">outputs</span> = <span style="color:#268bd2">block</span>(<span style="color:#268bd2">input_ids</span>, <span style="color:#268bd2">layer_past</span>=<span style="color:#268bd2">layer_past</span>, <span style="color:#268bd2">use_cache</span>=<span style="color:#268bd2">use_cache</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#859900">if</span> <span style="color:#268bd2">use_cache</span> <span style="color:#859900">is</span> <span style="color:#859900;font-weight:bold">True</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">presents</span> = <span style="color:#268bd2">presents</span> + (<span style="color:#268bd2">outputs</span>[<span style="color:#2aa198;font-weight:bold">1</span>],)
 </span></span><span style="display:flex;"><span>        
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> BaseModelOutputWithPastAndCrossAttentions(
-</span></span><span style="display:flex;"><span>            last_hidden_state<span style="color:#f92672">=</span>hidden_states,
-</span></span><span style="display:flex;"><span>            past_key_values<span style="color:#f92672">=</span>presents,
-</span></span><span style="display:flex;"><span>            hidden_states<span style="color:#f92672">=</span>all_hidden_states,
-</span></span><span style="display:flex;"><span>            attentions<span style="color:#f92672">=</span>all_self_attentions,
-</span></span><span style="display:flex;"><span>            cross_attentions<span style="color:#f92672">=</span>all_cross_attentions,
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">return</span> <span style="color:#268bd2">BaseModelOutputWithPastAndCrossAttentions</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">last_hidden_state</span>=<span style="color:#268bd2">hidden_states</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">past_key_values</span>=<span style="color:#268bd2">presents</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">hidden_states</span>=<span style="color:#268bd2">all_hidden_states</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">attentions</span>=<span style="color:#268bd2">all_self_attentions</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">cross_attentions</span>=<span style="color:#268bd2">all_cross_attentions</span>,
 </span></span><span style="display:flex;"><span>        )
-</span></span></code></pre></div><p>The KV Cache in <code>past_key_values</code> of <code>GPT2Model.forward</code> is a <code>BaseModelOutputWithPastAndCrossAttentions</code>. It&rsquo;s of shape <code>(num_layers, 2)</code>, where the first dimension corresponds to the layer index and the second dimension is <code>key</code> at index 0 and <code>value</code> at index 1. Then each tensor is of shape <code>(batch_size, num_heads, seq_len, head_dim)</code>.</p>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The KV Cache in <code>past_key_values</code> of <code>GPT2Model.forward</code> is a <code>BaseModelOutputWithPastAndCrossAttentions</code>. It&rsquo;s of shape <code>(num_layers, 2)</code>, where the first dimension corresponds to the layer index and the second dimension is <code>key</code> at index 0 and <code>value</code> at index 1. Then each tensor is of shape <code>(batch_size, num_heads, seq_len, head_dim)</code>.</p>
 <p>During generation, a <code>DynamicCache</code> instance is created in <code>GenerationMixin</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#/src/transformers/src/transformers/generation/utils.py</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GenerationMixin</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_prepare_cache_for_generation</span>(self, model_kwargs: Dict[str, Any]):
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>        cache_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;past_key_values&#34;</span>
-</span></span><span style="display:flex;"><span>        model_kwargs[cache_name] <span style="color:#f92672">=</span> DynamicCache()
+<div class="highlight"><div style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#93a1a1;font-style:italic">#/src/transformers/src/transformers/generation/utils.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#859900">class</span> <span style="color:#cb4b16">GenerationMixin</span>:
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">def</span> <span style="color:#268bd2">_prepare_cache_for_generation</span>(<span style="color:#268bd2">self</span>, <span style="color:#268bd2">model_kwargs</span>: <span style="color:#268bd2">Dict</span>[<span style="color:#cb4b16">str</span>, <span style="color:#268bd2">Any</span>]):
+</span></span><span style="display:flex;"><span>        ...
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">cache_name</span> = <span style="color:#2aa198">&#34;past_key_values&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">model_kwargs</span>[<span style="color:#268bd2">cache_name</span>] = <span style="color:#268bd2">DynamicCache</span>()
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">#src/transformers/cache_utils.py</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DynamicCache</span>(Cache):
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self):
-</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>_seen_tokens <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>  <span style="color:#75715e"># Used in `generate` to keep tally of how many tokens the cache has seen</span>
-</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>key_cache: List[torch<span style="color:#f92672">.</span>Tensor] <span style="color:#f92672">=</span> []
-</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>value_cache: List[torch<span style="color:#f92672">.</span>Tensor] <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span><span style="color:#93a1a1;font-style:italic">#src/transformers/cache_utils.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#859900">class</span> <span style="color:#cb4b16">DynamicCache</span>(<span style="color:#268bd2">Cache</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">def</span> <span style="color:#268bd2">__init__</span>(<span style="color:#268bd2">self</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">self</span>.<span style="color:#268bd2">_seen_tokens</span> = <span style="color:#2aa198;font-weight:bold">0</span>  <span style="color:#93a1a1;font-style:italic"># Used in `generate` to keep tally of how many tokens the cache has seen</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">self</span>.<span style="color:#268bd2">key_cache</span>: <span style="color:#268bd2">List</span>[<span style="color:#268bd2">torch</span>.<span style="color:#268bd2">Tensor</span>] = []
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">self</span>.<span style="color:#268bd2">value_cache</span>: <span style="color:#268bd2">List</span>[<span style="color:#268bd2">torch</span>.<span style="color:#268bd2">Tensor</span>] = []
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(
-</span></span><span style="display:flex;"><span>        self,
-</span></span><span style="display:flex;"><span>        key_states: torch<span style="color:#f92672">.</span>Tensor,
-</span></span><span style="display:flex;"><span>        value_states: torch<span style="color:#f92672">.</span>Tensor,
-</span></span><span style="display:flex;"><span>        layer_idx: int,
-</span></span><span style="display:flex;"><span>        cache_kwargs: Optional[Dict[str, Any]] <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>,
-</span></span><span style="display:flex;"><span>    ) <span style="color:#f92672">-&gt;</span> Tuple[torch<span style="color:#f92672">.</span>Tensor, torch<span style="color:#f92672">.</span>Tensor]:
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Update the number of seen tokens on layer 0.</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> layer_idx <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
-</span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>_seen_tokens <span style="color:#f92672">+=</span> key_states<span style="color:#f92672">.</span>shape[<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">def</span> <span style="color:#268bd2">update</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">self</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">key_states</span>: <span style="color:#268bd2">torch</span>.<span style="color:#268bd2">Tensor</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">value_states</span>: <span style="color:#268bd2">torch</span>.<span style="color:#268bd2">Tensor</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">layer_idx</span>: <span style="color:#cb4b16">int</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">cache_kwargs</span>: <span style="color:#268bd2">Optional</span>[<span style="color:#268bd2">Dict</span>[<span style="color:#cb4b16">str</span>, <span style="color:#268bd2">Any</span>]] = <span style="color:#859900;font-weight:bold">None</span>,
+</span></span><span style="display:flex;"><span>    ) -&gt; <span style="color:#268bd2">Tuple</span>[<span style="color:#268bd2">torch</span>.<span style="color:#268bd2">Tensor</span>, <span style="color:#268bd2">torch</span>.<span style="color:#268bd2">Tensor</span>]:
+</span></span><span style="display:flex;"><span>        <span style="color:#93a1a1;font-style:italic"># Update the number of seen tokens on layer 0.</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">if</span> <span style="color:#268bd2">layer_idx</span> == <span style="color:#2aa198;font-weight:bold">0</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">self</span>.<span style="color:#268bd2">_seen_tokens</span> += <span style="color:#268bd2">key_states</span>.<span style="color:#268bd2">shape</span>[-<span style="color:#2aa198;font-weight:bold">2</span>]
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Update the cache</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> key_states <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Initialization phase, the layer cache not there yet.</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> len(self<span style="color:#f92672">.</span>key_cache) <span style="color:#f92672">&lt;=</span> layer_idx:
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>                self<span style="color:#f92672">.</span>key_cache<span style="color:#f92672">.</span>append(key_states)
-</span></span><span style="display:flex;"><span>                self<span style="color:#f92672">.</span>value_cache<span style="color:#f92672">.</span>append(value_states)
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># Otherwise, only append current key and value to the cache.</span>
-</span></span><span style="display:flex;"><span>                self<span style="color:#f92672">.</span>key_cache[layer_idx] <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>cat([self<span style="color:#f92672">.</span>key_cache[layer_idx], key_states], dim<span style="color:#f92672">=-</span><span style="color:#ae81ff">2</span>)
-</span></span><span style="display:flex;"><span>                self<span style="color:#f92672">.</span>value_cache[layer_idx] <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>cat([self<span style="color:#f92672">.</span>value_cache[layer_idx], value_states], dim<span style="color:#f92672">=-</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#93a1a1;font-style:italic"># Update the cache</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">if</span> <span style="color:#268bd2">key_states</span> <span style="color:#859900">is</span> <span style="color:#859900">not</span> <span style="color:#859900;font-weight:bold">None</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#93a1a1;font-style:italic"># Initialization phase, the layer cache not there yet.</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#859900">if</span> <span style="color:#cb4b16">len</span>(<span style="color:#268bd2">self</span>.<span style="color:#268bd2">key_cache</span>) &lt;= <span style="color:#268bd2">layer_idx</span>:
+</span></span><span style="display:flex;"><span>                ...
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">self</span>.<span style="color:#268bd2">key_cache</span>.<span style="color:#268bd2">append</span>(<span style="color:#268bd2">key_states</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">self</span>.<span style="color:#268bd2">value_cache</span>.<span style="color:#268bd2">append</span>(<span style="color:#268bd2">value_states</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#859900">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#93a1a1;font-style:italic"># Otherwise, only append current key and value to the cache.</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">self</span>.<span style="color:#268bd2">key_cache</span>[<span style="color:#268bd2">layer_idx</span>] = <span style="color:#268bd2">torch</span>.<span style="color:#268bd2">cat</span>([<span style="color:#268bd2">self</span>.<span style="color:#268bd2">key_cache</span>[<span style="color:#268bd2">layer_idx</span>], <span style="color:#268bd2">key_states</span>], <span style="color:#268bd2">dim</span>=-<span style="color:#2aa198;font-weight:bold">2</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">self</span>.<span style="color:#268bd2">value_cache</span>[<span style="color:#268bd2">layer_idx</span>] = <span style="color:#268bd2">torch</span>.<span style="color:#268bd2">cat</span>([<span style="color:#268bd2">self</span>.<span style="color:#268bd2">value_cache</span>[<span style="color:#268bd2">layer_idx</span>], <span style="color:#268bd2">value_states</span>], <span style="color:#268bd2">dim</span>=-<span style="color:#2aa198;font-weight:bold">2</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>key_cache[layer_idx], self<span style="color:#f92672">.</span>value_cache[layer_idx]
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">return</span> <span style="color:#268bd2">self</span>.<span style="color:#268bd2">key_cache</span>[<span style="color:#268bd2">layer_idx</span>], <span style="color:#268bd2">self</span>.<span style="color:#268bd2">value_cache</span>[<span style="color:#268bd2">layer_idx</span>]
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@classmethod</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">from_legacy_cache</span>(cls, past_key_values: Optional[Tuple[Tuple[torch<span style="color:#f92672">.</span>FloatTensor]]] <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>) <span style="color:#f92672">-&gt;</span> <span style="color:#e6db74">&#34;DynamicCache&#34;</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;Converts a cache in the legacy cache format into an equivalent `DynamicCache`. &#34;&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>        cache <span style="color:#f92672">=</span> cls()
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> past_key_values <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> layer_idx <span style="color:#f92672">in</span> range(len(past_key_values)):
-</span></span><span style="display:flex;"><span>                key_states, value_states <span style="color:#f92672">=</span> past_key_values[layer_idx]
-</span></span><span style="display:flex;"><span>                cache<span style="color:#f92672">.</span>update(key_states, value_states, layer_idx)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> cache
-</span></span></code></pre></div><p>Then the KV Cache is loaded and used for generation in <code>_sample</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>src<span style="color:#f92672">/</span>transformers<span style="color:#f92672">/</span>generation<span style="color:#f92672">/</span>utils<span style="color:#f92672">.</span>py
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GenerationMixin</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_sample</span>(self, <span style="color:#f92672">...</span>):
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> self<span style="color:#f92672">.</span>_has_unfinished_sequences():
-</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Prepare KV Cache is in prepare_inputs_for_generation</span>
-</span></span><span style="display:flex;"><span>            model_inputs <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prepare_inputs_for_generation(input_ids, <span style="color:#f92672">**</span>model_kwargs)
-</span></span><span style="display:flex;"><span>            outputs <span style="color:#f92672">=</span> model_forward(<span style="color:#f92672">**</span>model_inputs, return_dict<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> GenerateDecoderOnlyOutput(
-</span></span><span style="display:flex;"><span>                    sequences<span style="color:#f92672">=</span>input_ids,
-</span></span><span style="display:flex;"><span>                    scores<span style="color:#f92672">=</span>scores,
-</span></span><span style="display:flex;"><span>                    logits<span style="color:#f92672">=</span>raw_logits,
-</span></span><span style="display:flex;"><span>                    attentions<span style="color:#f92672">=</span>decoder_attentions,
-</span></span><span style="display:flex;"><span>                    hidden_states<span style="color:#f92672">=</span>decoder_hidden_states,
-</span></span><span style="display:flex;"><span>                    past_key_values<span style="color:#f92672">=</span>model_kwargs<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;past_key_values&#34;</span>),
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@classmethod</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">def</span> <span style="color:#268bd2">from_legacy_cache</span>(<span style="color:#268bd2">cls</span>, <span style="color:#268bd2">past_key_values</span>: <span style="color:#268bd2">Optional</span>[<span style="color:#268bd2">Tuple</span>[<span style="color:#268bd2">Tuple</span>[<span style="color:#268bd2">torch</span>.<span style="color:#268bd2">FloatTensor</span>]]] = <span style="color:#859900;font-weight:bold">None</span>) -&gt; <span style="color:#2aa198">&#34;DynamicCache&#34;</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#2aa198">&#34;&#34;&#34;Converts a cache in the legacy cache format into an equivalent `DynamicCache`. &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">cache</span> = <span style="color:#268bd2">cls</span>()
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">if</span> <span style="color:#268bd2">past_key_values</span> <span style="color:#859900">is</span> <span style="color:#859900">not</span> <span style="color:#859900;font-weight:bold">None</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#859900">for</span> <span style="color:#268bd2">layer_idx</span> <span style="color:#859900">in</span> <span style="color:#cb4b16">range</span>(<span style="color:#cb4b16">len</span>(<span style="color:#268bd2">past_key_values</span>)):
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">key_states</span>, <span style="color:#268bd2">value_states</span> = <span style="color:#268bd2">past_key_values</span>[<span style="color:#268bd2">layer_idx</span>]
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">cache</span>.<span style="color:#268bd2">update</span>(<span style="color:#268bd2">key_states</span>, <span style="color:#268bd2">value_states</span>, <span style="color:#268bd2">layer_idx</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">return</span> <span style="color:#268bd2">cache</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then the KV Cache is loaded and used for generation in <code>_sample</code>:</p>
+<div class="highlight"><div style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#586e75;background-color:#eee8d5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#268bd2">src</span>/<span style="color:#268bd2">transformers</span>/<span style="color:#268bd2">generation</span>/<span style="color:#268bd2">utils</span>.<span style="color:#268bd2">py</span>
+</span></span><span style="display:flex;"><span><span style="color:#859900">class</span> <span style="color:#cb4b16">GenerationMixin</span>:
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>    <span style="color:#859900">def</span> <span style="color:#268bd2">_sample</span>(<span style="color:#268bd2">self</span>, ...):
+</span></span><span style="display:flex;"><span>        ...
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">while</span> <span style="color:#268bd2">self</span>.<span style="color:#268bd2">_has_unfinished_sequences</span>():
+</span></span><span style="display:flex;"><span>            <span style="color:#93a1a1;font-style:italic"># Prepare KV Cache is in prepare_inputs_for_generation</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">model_inputs</span> = <span style="color:#268bd2">self</span>.<span style="color:#268bd2">prepare_inputs_for_generation</span>(<span style="color:#268bd2">input_ids</span>, **<span style="color:#268bd2">model_kwargs</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">outputs</span> = <span style="color:#268bd2">model_forward</span>(**<span style="color:#268bd2">model_inputs</span>, <span style="color:#268bd2">return_dict</span>=<span style="color:#859900;font-weight:bold">True</span>)
+</span></span><span style="display:flex;"><span>        ...
+</span></span><span style="display:flex;"><span>        <span style="color:#859900">return</span> <span style="color:#268bd2">GenerateDecoderOnlyOutput</span>(
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">sequences</span>=<span style="color:#268bd2">input_ids</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">scores</span>=<span style="color:#268bd2">scores</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">logits</span>=<span style="color:#268bd2">raw_logits</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">attentions</span>=<span style="color:#268bd2">decoder_attentions</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">hidden_states</span>=<span style="color:#268bd2">decoder_hidden_states</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#268bd2">past_key_values</span>=<span style="color:#268bd2">model_kwargs</span>.<span style="color:#268bd2">get</span>(<span style="color:#2aa198">&#34;past_key_values&#34;</span>),
 </span></span><span style="display:flex;"><span>                )
-</span></span></code></pre></div>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
   </div>
 

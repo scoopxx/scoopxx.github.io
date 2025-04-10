@@ -9,6 +9,11 @@ enableEmoji = true  # This enables emoji shortcodes
 [outputs]
   home = ["HTML", "RSS", "JSON"]
 
+[markup]
+  [markup.highlight]
+      style = "solarized-light"
+      lineNos = true
+
 [params]
   title = "log(hx)"
   description = "Brain dump and share my learnings here."
@@ -72,4 +77,3 @@ enableEmoji = true  # This enables emoji shortcodes
     name = "About"
     url = "/about/"
     weight = 50
-  

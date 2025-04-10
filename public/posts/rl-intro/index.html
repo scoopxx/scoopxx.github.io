@@ -7,9 +7,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Introduction to Reinforcement Learning | Hxx&#39;Log</title>
 <meta name="keywords" content="Reinforcement Learning">
-<meta name="description" content="Intuition
-I&rsquo;ve been having interests in Reinforcement Learning(RL) for a while, especially after ChatGPT when everyone was talking about RLHF, but often felt it&rsquo;s too daunting for me to do some reading and dig into it. Recently I finally found some spare time to go through it, and fortunately the famous Richard Sutton&rsquo;s &lt;Reinforcement Learning: an Introduction&gt; book is surprisingly intuitive even for RL beginners.
-However, the mathematical notions used in RL is quite different from those used in supervised learning, and may felt weird or confusing for beginners just like me. As a reference, I will share and summarize my reading notes here.">
+<meta name="description" content="1. Intuition
+I&rsquo;ve been interested in Reinforcement Learning (RL) for a while, especially following the recent advancements in LLM post-training using RL. However, the mathematical concepts and various notions used in RL differ significantly from those in supervised learning, which can feel strange or confusing for beginners like myself. For instance, in traditional machine learning, we typically discuss model, data, and loss function. In contrast, RL introduces terms like on-policy, reward, model-free, and agent.">
 <meta name="author" content="hxx">
 <link rel="canonical" href="http://localhost:1313/posts/rl-intro/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.45e028aa8ce0961349adf411b013ee39406be2c0bc80d4ea3fc04555f7f4611a.css" integrity="sha256-ReAoqozglhNJrfQRsBPuOUBr4sC8gNTqP8BFVff0YRo=" rel="preload stylesheet" as="style">
@@ -157,7 +156,7 @@ However, the mathematical notions used in RL is quite different from those used 
         </svg>
       </span>
     </h1>
-    <div class="post-meta"><span title='2025-03-03 00:00:00 +0000 UTC'>March 3, 2025</span>&nbsp;·&nbsp;27 min&nbsp;·&nbsp;hxx
+    <div class="post-meta"><span title='2025-03-03 00:00:00 +0000 UTC'>March 3, 2025</span>&nbsp;·&nbsp;29 min&nbsp;·&nbsp;hxx
 
 </div>
   </header> <div class="toc">
@@ -168,69 +167,87 @@ However, the mathematical notions used in RL is quite different from those used 
 
         <div class="inner"><ul>
                 <li>
-                    <a href="#intuition" aria-label="Intuition">Intuition</a></li>
+                    <a href="#1-intuition" aria-label="1. Intuition">1. Intuition</a></li>
                 <li>
-                    <a href="#introduction-of-reinforcement-learning" aria-label="Introduction of Reinforcement Learning">Introduction of Reinforcement Learning</a><ul>
+                    <a href="#2-introduction-of-reinforcement-learning" aria-label="2. Introduction of Reinforcement Learning">2. Introduction of Reinforcement Learning</a><ul>
                         
                 <li>
-                    <a href="#components-of-rl" aria-label="Components of RL">Components of RL</a><ul>
+                    <a href="#21-components-of-rl" aria-label="2.1 Components of RL">2.1 Components of RL</a><ul>
                         
                 <li>
-                    <a href="#21-policy" aria-label="2.1 Policy">2.1 Policy</a></li>
+                    <a href="#211-policy" aria-label="2.1.1 Policy">2.1.1 Policy</a></li>
                 <li>
-                    <a href="#22-value-function" aria-label="2.2 Value Function">2.2 Value Function</a></li>
+                    <a href="#212-value-function" aria-label="2.1.2 Value Function">2.1.2 Value Function</a></li>
                 <li>
-                    <a href="#23-model" aria-label="2.3 Model">2.3 Model</a></li></ul>
+                    <a href="#213-model" aria-label="2.1.3 Model">2.1.3 Model</a></li></ul>
                 </li>
                 <li>
-                    <a href="#optimization-of-rl" aria-label="Optimization of RL">Optimization of RL</a></li>
-                <li>
-                    <a href="#31-value-based-agent" aria-label="3.1 Value-based agent">3.1 Value-based agent</a></li>
-                <li>
-                    <a href="#32-policy-based-agent" aria-label="3.2 Policy-based agent">3.2 Policy-based agent</a></li>
-                <li>
-                    <a href="#33-actor-critic" aria-label="3.3 Actor-Critic">3.3 Actor-Critic</a></li></ul>
-                </li>
-                <li>
-                    <a href="#4-example-problem-cliff-walking-problem" aria-label="4. Example Problem, Cliff Walking Problem">4. Example Problem, Cliff Walking Problem</a><ul>
+                    <a href="#22-optimization-of-rl" aria-label="2.2 Optimization of RL">2.2 Optimization of RL</a><ul>
                         
                 <li>
-                    <a href="#41-problem-statement" aria-label="4.1 Problem Statement:">4.1 Problem Statement:</a><ul>
-                        
+                    <a href="#221-value-based-agent" aria-label="2.2.1 Value-based Agent">2.2.1 Value-based Agent</a></li>
                 <li>
-                    <a href="#411-define-the-environemnt" aria-label="4.1.1 Define the Environemnt">4.1.1 Define the Environemnt</a></li>
+                    <a href="#222-policy-based-agent" aria-label="2.2.2 Policy-based Agent">2.2.2 Policy-based Agent</a></li>
                 <li>
-                    <a href="#412-define-the-step-function" aria-label="4.1.2 Define the Step function">4.1.2 Define the Step function</a></li></ul>
+                    <a href="#223-actor-critic" aria-label="2.2.3 Actor-Critic">2.2.3 Actor-Critic</a></li></ul>
                 </li></ul>
                 </li>
                 <li>
-                    <a href="#5-dynamic-programming-methods" aria-label="5. Dynamic Programming Methods">5. Dynamic Programming Methods</a><ul>
+                    <a href="#3-example-problem-cliff-walking-problem" aria-label="3. Example Problem, Cliff Walking Problem">3. Example Problem, Cliff Walking Problem</a><ul>
                         
                 <li>
-                    <a href="#51-introduction" aria-label="5.1 Introduction">5.1 Introduction</a></li>
+                    <a href="#31-problem-statement" aria-label="3.1 Problem Statement:">3.1 Problem Statement:</a></li>
                 <li>
-                    <a href="#511-markov-property" aria-label="5.1.1 Markov Property">5.1.1 Markov Property</a></li>
-                <li>
-                    <a href="#512-bellman-optimal-function" aria-label="5.1.2 Bellman Optimal Function">5.1.2 Bellman Optimal Function</a></li>
-                <li>
-                    <a href="#52-value-iteration" aria-label="5.2 Value Iteration">5.2 Value Iteration</a><ul>
+                    <a href="#32-python-implementation" aria-label="3.2 Python Implementation">3.2 Python Implementation</a><ul>
                         
                 <li>
-                    <a href="#521-value-iteration-for-cliff-walking" aria-label="5.2.1 Value Iteration for Cliff Walking">5.2.1 Value Iteration for Cliff Walking</a></li>
+                    <a href="#321-cliff-walking-environment" aria-label="3.2.1 Cliff Walking Environment">3.2.1 Cliff Walking Environment</a></li>
                 <li>
-                    <a href="#522-python-implementation-of-value-iteration-for-cliff-walking" aria-label="5.2.2 Python Implementation of Value Iteration for Cliff Walking">5.2.2 Python Implementation of Value Iteration for Cliff Walking</a></li>
-                <li>
-                    <a href="#523-result-and-visualization" aria-label="5.2.3 Result and Visualization">5.2.3 Result and Visualization</a></li></ul>
+                    <a href="#322-define-the-step-function" aria-label="3.2.2 Define the Step Function">3.2.2 Define the Step Function</a></li></ul>
+                </li></ul>
                 </li>
                 <li>
-                    <a href="#53-policy-iteration" aria-label="5.3 Policy Iteration">5.3 Policy Iteration</a><ul>
+                    <a href="#4-dynamic-programming-methods" aria-label="4. Dynamic Programming Methods">4. Dynamic Programming Methods</a><ul>
                         
                 <li>
-                    <a href="#531-policy-iteration-for-cliff-walking" aria-label="5.3.1 Policy Iteration for Cliff Walking">5.3.1 Policy Iteration for Cliff Walking</a></li>
+                    <a href="#41-introduction" aria-label="4.1 Introduction">4.1 Introduction</a></li>
                 <li>
-                    <a href="#532-python-implementation-of-policy-iteration-for-cliff-walking" aria-label="5.3.2 Python Implementation of Policy Iteration for Cliff Walking">5.3.2 Python Implementation of Policy Iteration for Cliff Walking</a></li>
+                    <a href="#411-markov-property" aria-label="4.1.1 Markov Property">4.1.1 Markov Property</a></li>
                 <li>
-                    <a href="#533-results-and-evaluation" aria-label="5.3.3 Results and Evaluation">5.3.3 Results and Evaluation</a></li></ul>
+                    <a href="#412-bellman-optimal-function" aria-label="4.1.2 Bellman Optimal Function">4.1.2 Bellman Optimal Function</a></li>
+                <li>
+                    <a href="#42-value-iteration" aria-label="4.2 Value Iteration">4.2 Value Iteration</a><ul>
+                        
+                <li>
+                    <a href="#421-value-iteration-for-cliff-walking" aria-label="4.2.1 Value Iteration for Cliff Walking">4.2.1 Value Iteration for Cliff Walking</a></li>
+                <li>
+                    <a href="#422-python-implementation-of-value-iteration-for-cliff-walking" aria-label="4.2.2 Python Implementation of Value Iteration for Cliff Walking">4.2.2 Python Implementation of Value Iteration for Cliff Walking</a><ul>
+                        
+                <li>
+                    <a href="#4221-one-epoch-update" aria-label="4.2.2.1 One Epoch Update">4.2.2.1 One Epoch Update</a></li>
+                <li>
+                    <a href="#4222-training" aria-label="4.2.2.2 Training">4.2.2.2 Training</a></li>
+                <li>
+                    <a href="#423-result-and-visualization" aria-label="4.2.3 Result and Visualization">4.2.3 Result and Visualization</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#43-policy-iteration" aria-label="4.3 Policy Iteration">4.3 Policy Iteration</a><ul>
+                        
+                <li>
+                    <a href="#431-policy-iteration-for-cliff-walking" aria-label="4.3.1 Policy Iteration for Cliff Walking">4.3.1 Policy Iteration for Cliff Walking</a></li>
+                <li>
+                    <a href="#432-python-implementation-of-policy-iteration-for-cliff-walking" aria-label="4.3.2 Python Implementation of Policy Iteration for Cliff Walking">4.3.2 Python Implementation of Policy Iteration for Cliff Walking</a><ul>
+                        
+                <li>
+                    <a href="#4321-policy-evaluation" aria-label="4.3.2.1 Policy Evaluation">4.3.2.1 Policy Evaluation</a></li>
+                <li>
+                    <a href="#4322-policy-improvement" aria-label="4.3.2.2 Policy Improvement">4.3.2.2 Policy Improvement</a></li>
+                <li>
+                    <a href="#4323-training" aria-label="4.3.2.3 Training">4.3.2.3 Training</a></li>
+                <li>
+                    <a href="#4324-results-and-evaluation" aria-label="4.3.2.4 Results and Evaluation">4.3.2.4 Results and Evaluation</a></li></ul>
+                </li></ul>
                 </li></ul>
                 </li>
                 <li>
@@ -293,123 +310,137 @@ However, the mathematical notions used in RL is quite different from those used 
     </details>
 </div>
 
-  <div class="post-content"><h2 id="intuition">Intuition<a hidden class="anchor" aria-hidden="true" href="#intuition">#</a></h2>
-<p>I&rsquo;ve been having interests in Reinforcement Learning(RL) for a while, especially after ChatGPT when everyone was talking about <code>RLHF</code>, but often felt it&rsquo;s too daunting for me to do some reading and dig into it. Recently I finally found some spare time to go through it, and fortunately the famous Richard Sutton&rsquo;s &lt;Reinforcement Learning: an Introduction&gt; book is surprisingly intuitive even for RL beginners.</p>
-<p>However, the mathematical notions used in RL is quite different from those used in supervised learning, and may felt weird or confusing for beginners just like me. As a reference, I will share and summarize my reading notes here.</p>
-<h2 id="introduction-of-reinforcement-learning">Introduction of Reinforcement Learning<a hidden class="anchor" aria-hidden="true" href="#introduction-of-reinforcement-learning">#</a></h2>
-<p>So first of all, why is RL needed since we already have supervised/unsupervised learning? And how is RL different from the other methods?</p>
-<p>Wikipedia&rsquo;s definition of the term <a href="https://en.wikipedia.org/wiki/Machine_learning"><strong>Machine Learning</strong></a> is: <em>statistical algorithms that can learn from data and generaize to unseen data.</em> Say we have data $X$, and its training data sample $x_i$, we are trying to learning the distribution about $X$.</p>
+  <div class="post-content"><h2 id="1-intuition">1. Intuition<a hidden class="anchor" aria-hidden="true" href="#1-intuition">#</a></h2>
+<p>I&rsquo;ve been interested in Reinforcement Learning (RL) for a while, especially following the recent advancements in LLM post-training using RL. However, the mathematical concepts and various notions used in RL differ significantly from those in supervised learning, which can feel strange or confusing for beginners like myself. For instance, in traditional machine learning, we typically discuss <code>model</code>, <code>data</code>, and <code>loss function</code>. In contrast, RL introduces terms like <code>on-policy</code>, <code>reward</code>, <code>model-free</code>, and <code>agent</code>.</p>
+<p>Recently, I finally found some spare time to delve into RL, and fortunately, Richard Sutton&rsquo;s book, <em>Reinforcement Learning: An Introduction</em>, is surprisingly intuitive, even for RL beginners. I want to summarize and share my learnings here.</p>
+<p>In this article, I aim to explain some of the basic concepts and elements of RL. I will address the RL problem of <code>cliff walking</code> using three classes of methods: 1. Dynamic Programming, 2. Monte Carlo Methods, and 3. Temporal-Difference Learning. This discussion primarily covers content from chapters 1-6 of Sutton &amp; Barto&rsquo;s book.</p>
+<h2 id="2-introduction-of-reinforcement-learning">2. Introduction of Reinforcement Learning<a hidden class="anchor" aria-hidden="true" href="#2-introduction-of-reinforcement-learning">#</a></h2>
+<p>Why is RL necessary when we already have supervised and unsupervised learning? How does RL differ from these methods?</p>
+<p>According to <a href="https://en.wikipedia.org/wiki/Machine_learning">Wikipedia</a>, <strong>Machine Learning</strong> involves statistical algorithms that can learn from data and generalize to unseen data. Suppose we have data $X$ and its training sample $x_i$; we aim to learn the distribution of $X$.</p>
 <ul>
 <li>
-<p>In supervised learning, the data is pair of $&lt;x_i, y_i&gt;$, so we are trying to learn distribution $p(y_ | x_)$. For example, in image classification, given a image $x$, trying to predict its label $y$. If we viewed GPT as a special case of supervised learning, it can be seen as given a text sequence&rsquo;s previous tokens, predict the next token.</p>
+<p>In supervised learning, the data consists of pairs $&lt;x_i, y_i&gt;$, and we aim to learn the distribution $p(y | x)$. For example, in image classification, given an image $x$, we predict its label $y$. Viewing GPT as a special case of supervised learning, it predicts the next token given a text sequence&rsquo;s previous tokens.</p>
 </li>
 <li>
-<p>In reinforcement learning, the $x$ is no longer static, or known before training. If in supervised learning the goal is to learn a mapping from $x_i$ to $y_i$, in RL it became to learn the mapping from situations to actions, both can only get through direct interaction with the environment.</p>
+<p>In unsupervised learning, the data consists of input features $x_i$ without associated labels. The goal is to learn the underlying structure or distribution of the data. Unsupervised learning is used when we want to explore the data&rsquo;s inherent patterns without predefined categories.</p>
+</li>
+<li>
+<p>In reinforcement learning, the input $x$ is dynamic and evolves over time, unlike in supervised learning where $x_i$ and $y_i$ are static pairs, or in unsupervised learning where we only deal with $x_i$. Reinforcement learning focuses on learning a policy $\pi(a | s)$ that maps situations (states) to actions through direct interaction with the environment over time. This temporal aspect is crucial because the agent&rsquo;s actions influence future states and rewards.</p>
 </li>
 </ul>
-<h3 id="components-of-rl">Components of RL<a hidden class="anchor" aria-hidden="true" href="#components-of-rl">#</a></h3>
-<p>We defined reinforcement learning as a method to model the interaction in a game/strategy etc. There are two entities in such RL system:</p>
+<p>For example, consider a self-driving car navigating through traffic. In this scenario, the car must continuously decide on actions (accelerate, brake, turn) based on the current state (traffic conditions, road layout). Supervised learning would struggle here because it requires predefined labels for each possible scenario, which is impractical. Reinforcement learning, however, allows the car to learn optimal driving strategies by interacting with the environment and receiving feedback (rewards) based on its actions.</p>
+<h3 id="21-components-of-rl">2.1 Components of RL<a hidden class="anchor" aria-hidden="true" href="#21-components-of-rl">#</a></h3>
+<p>Reinforcement learning models interactions in games or strategies. There are two entities in an RL system:</p>
 <p><img alt="Agent Environment Interaction" loading="lazy" src="/images/ae1.png"></p>
 <ul>
-<li>$Agent$ is the learner and decision-maker.</li>
-<li>$Environment$ is everything outside the agent that it interacts with.</li>
+<li><strong>Agent</strong>: The learner and decision-maker.</li>
+<li><strong>Environment</strong>: Everything outside the agent that it interacts with.</li>
 </ul>
-<p>Then there are three types of interactions between agent and environment:</p>
+<p>There are three types of interactions between the agent and environment:</p>
 <ul>
-<li>$Action$ is an action the agent takes to interact with the environment.</li>
-<li>$State$ is a representation of the environment, which is changed by action.</li>
-<li>$Reward$ can be seen as the environment&rsquo;s corresponding response to the agent based on its state.</li>
+<li><strong>Action</strong>: An action the agent takes to interact with the environment.</li>
+<li><strong>State</strong>: A representation of the environment, altered by actions.</li>
+<li><strong>Reward</strong>: The environment&rsquo;s response to the agent based on its state.</li>
 </ul>
 <p>A sequence of interactions is:</p>
 <ul>
-<li>In $t$, the environment&rsquo;s state is $S_t$, it exhibits reward $R_t$</li>
-<li>Based on $S_t$ and $R_t$, the agent takes action $A_t$</li>
-<li>As a result of $A_t$, the state changed to $S_{t+1}$, and exhibits reward $R_{t+1}$</li>
+<li>At time $t$, the environment&rsquo;s state is $s_t$, providing reward $r_t$.</li>
+<li>Based on $s_t$ and $r_t$, the agent takes action $a_t$.</li>
+<li>As a result of $a_t$, the state changes to $s_{t+1}$, providing reward $r_{t+1}$.</li>
 </ul>
-<p>The goal of an RL system is to learn a strategy so the agent makes the best action in each step to maximize its rewards. We can define three components of such agent:</p>
+<p>The goal of an RL system is to learn a strategy that enables the agent to make the best action at each step to maximize rewards. An agent is characterized by three components:</p>
 <ul>
-<li>$Policy$ is the strategy the agent used to determine its next action.</li>
-<li>$Value\ Function$ is a function the agent used to evaluate its current state</li>
-<li>$Model$ is the way the environment interacts with the agent, it defined how the environment works.</li>
+<li><strong>Policy</strong>: The strategy the agent uses to determine its next action.</li>
+<li><strong>Value Function</strong>: A function the agent uses to evaluate its current state.</li>
+<li><strong>Model</strong>: The way the environment interacts with the agent, defining how the environment operates.</li>
 </ul>
-<h4 id="21-policy">2.1 Policy<a hidden class="anchor" aria-hidden="true" href="#21-policy">#</a></h4>
-<p>Policy is a mapping from current state $s_t$ to action $a_t$. It can be deterministic or stochastic:</p>
-<p>In <strong>Stochastic Policy</strong>, the result is a ditribution, in which the agent sample its action from.</p>
-<p>$\pi(a_{t} | s_{t}) = p(a = a_t | s=s_t) $</p>
-<p>In <strong>Deterministic Policy</strong>, the result is a action, for a given state, the agent will surely execute a specific action.</p>
-<p>$a_{t} = argmax\ \pi(a|s_t)$</p>
-<h4 id="22-value-function">2.2 Value Function<a hidden class="anchor" aria-hidden="true" href="#22-value-function">#</a></h4>
-<p>In an RL system, the end goal is to find a strategy to win the game, like in Chess or Go. At any timestamp t, we wants to have a metric to evaluate the effectiveness of current strategy.</p>
-<p>The reward $R_t$ defined above only refers to immediate reward at timestamp $t$, but not the overall winning chance. So we defined $V_t$ as the overall reward at timestamp $t$, which includes the current immediate reward $R_t$, and its expected future reward $V_{t+1}$.</p>
-<p>$V_t = R_t + \gamma V_{t+1}$</p>
-<p>So the reward at timestamp $t$ is decided by its current state $s_t$, its taken action $a_t$, and its next state $s_{t+1}$.</p>
+<h4 id="211-policy">2.1.1 Policy<a hidden class="anchor" aria-hidden="true" href="#211-policy">#</a></h4>
+<p>A policy maps the current state $s_t$ to action $a_t$. It can be deterministic or stochastic:</p>
+<ul>
+<li>
+<p><strong>Stochastic Policy</strong>: The result is a distribution from which the agent samples its action.</p>
+<p>$\pi(a_{t} | s_{t}) = p(a = a_t | s=s_t)$</p>
+</li>
+<li>
+<p><strong>Deterministic Policy</strong>: The result is a specific action; for a given state, the agent executes a specific action.</p>
+<p>$a_{t} = \text{argmax}\ \pi(a|s_t)$</p>
+</li>
+</ul>
+<h4 id="212-value-function">2.1.2 Value Function<a hidden class="anchor" aria-hidden="true" href="#212-value-function">#</a></h4>
+<p>In an RL system, the end goal is to find a strategy to win games like Chess or Go. At any time $t$, we want a metric to evaluate the effectiveness of the current policy.</p>
+<p>The reward $r_t$ only refers to the immediate reward at time $t$, not the overall winning chance. Thus, we define $V_t$ as the overall reward at time $t$, including the current immediate reward $R_t$ and its expected future reward $V_{t+1}$.</p>
+<p>$V_t = r_t + \gamma V_{t+1}$</p>
+<p>The gamma ($\gamma$) discount factor is a crucial component in reinforcement learning. It determines the importance of future rewards compared to immediate rewards. A value of $\gamma$ close to 0 makes the agent short-sighted by prioritizing immediate rewards, while a value close to 1 encourages the agent to consider long-term rewards.</p>
+<p>The reward at time $t$ is determined by its current state $s_t$, the action taken $a_t$, and its next state $s_{t+1}$.</p>
 <p>$r_t = R(s_t, a_t, s_{t+1})$</p>
-<p>Assume we take $T$ steps from timestamp $0$ to $T-1$, all these steps form a trajectory $\tau$, the sum reward can be represented as the reward over the trajectory.</p>
+<p>Assuming we take $T$ steps from time $0$ to $T-1$, these steps form a trajectory $\tau$, and the sum reward is represented as the reward over the trajectory.</p>
 <p>$$
-\tau = (s_0, a_0, r_0, s_1, a_1, r_1, &hellip;, s_{T-1}, a_{T-1}, r_{T-1}) \</p>
+\tau = (s_0, a_0, r_0, s_1, a_1, r_1, &hellip;, s_{T-1}, a_{T-1}, r_{T-1}) \newline</p>
 <p>R(\tau) = \sum_{t=0}^{T-1}r_t <br>
 $$</p>
-<h4 id="23-model">2.3 Model<a hidden class="anchor" aria-hidden="true" href="#23-model">#</a></h4>
-<p>A $model$ defined how the environment interacts with the agent. A model is comprised of $&lt;S, A, P, R&gt;$</p>
+<h4 id="213-model">2.1.3 Model<a hidden class="anchor" aria-hidden="true" href="#213-model">#</a></h4>
+<p>A model defines how the environment interacts with the agent, comprising $&lt;S, A, P, R&gt;$:</p>
 <ul>
-<li>$S$, the space of all possible states</li>
-<li>$A$, the space of all possible actions</li>
-<li>$P$, transformation function of how state changed, $P(s_{t+1}|s_t, a_t)$</li>
-<li>$R$, how reward is calculated for each state, $R(s_t, a_t)$</li>
+<li>$S$: The space of all possible states.</li>
+<li>$A$: The space of all possible actions.</li>
+<li>$P$: The transformation function of how states change, $P(s_{t+1}|s_t, a_t)$.</li>
+<li>$R$: How rewards are calculated for each state, $R(s_t, a_t)$.</li>
 </ul>
-<p>If all these 4 elements are known, we can easily model the interaction without actual interaction, this is called <em>model based learning</em>.</p>
-<p>In reallity, while $S$ and $A$ is often known, the transformation and reward part is either fully unknown or hard to estimate, so agent need to interact with real environment to observe the state and reward, this is called <em>model-free learning</em>.</p>
-<p>Comparing the two, <em>model-free learning</em> relied on real interaction to get the next state and reward, while <em>model based learning</em> modeled these without specific interaction.</p>
-<h3 id="optimization-of-rl">Optimization of RL<a hidden class="anchor" aria-hidden="true" href="#optimization-of-rl">#</a></h3>
-<p>The optimization of a RL task can be divided into two parsts:</p>
+<p>If these four elements are known, we can model the interaction without actual interaction, known as <strong>model-based learning</strong>.</p>
+<p>In reality, while $S$ and $A$ are often known, the transformation and reward parts are either fully unknown or hard to estimate, so agents need to interact with the real environment to observe states and rewards, known as <strong>model-free learning</strong>.</p>
+<p>Comparing the two, <strong>model-free learning</strong> relies on real interaction to get the next state and reward, while <strong>model-based learning</strong> models these without specific interaction.</p>
+<h3 id="22-optimization-of-rl">2.2 Optimization of RL<a hidden class="anchor" aria-hidden="true" href="#22-optimization-of-rl">#</a></h3>
+<p>The optimization of an RL task can be divided into two parts:</p>
 <ul>
-<li><strong>Value estimation</strong>: given a strategy $\pi$, evaluate the effectiveness of how does the strategy work, this is computing $V_\pi$.</li>
-<li><strong>Policy optimization</strong>: given the value function $V_\pi$, optimize to get a better policy $\pi$.</li>
+<li><strong>Value Estimation</strong>: Given a strategy $\pi$, evaluate its effectiveness, computing $V_\pi$.</li>
+<li><strong>Policy Optimization</strong>: Given the value function $V_\pi$, optimize to get a better policy $\pi$.</li>
 </ul>
-<p>In essence this is very similar to k-Means clustering that we have two optimization targets, and we opmitize them iteratively to get the optimial answer. In k-means,</p>
+<p>This is similar to k-Means clustering, where we have two optimization targets and optimize them iteratively to get the optimal answer. In k-means:</p>
 <ul>
-<li>Given the current cluster assignment of each point, we compute the optimal centroid. Similar to <em>value estimation</em>.</li>
-<li>Given the current optimial centroid, we find better cluster assignment for each point. Similar to <em>policy optimization</em>.</li>
+<li>Given the current cluster assignment of each point, compute the optimal centroid. Similar to <em>value estimation</em>.</li>
+<li>Given the current optimal centroid, find a better cluster assignment for each point. Similar to <em>policy optimization</em>.</li>
 </ul>
-<p>But are the two steps both necessary in RL optimization? Answer is No.</p>
-<h3 id="31-value-based-agent">3.1 Value-based agent<a hidden class="anchor" aria-hidden="true" href="#31-value-based-agent">#</a></h3>
-<p>An agent can only learn the value function $V_\pi$, it can maintain a table of mapping from $&lt;S, A&gt;$ to $V$, then in each step, it picked the action that will maximize the ultimate value. In this type of work, the agent doesn&rsquo;t explicitely have a strategy or policy.</p>
-<p>$ a_t = argmax\ V(a | s_t)$</p>
-<h3 id="32-policy-based-agent">3.2 Policy-based agent<a hidden class="anchor" aria-hidden="true" href="#32-policy-based-agent">#</a></h3>
-<p>A policy agent directly learns the policy, and each step it directly outputs the distribution of next action without knowing value function.</p>
-<p>$ a_t \sim P(a|s_t)$</p>
-<h3 id="33-actor-critic">3.3 Actor-Critic<a hidden class="anchor" aria-hidden="true" href="#33-actor-critic">#</a></h3>
-<p>An agent can learn both $\pi$ and $V_{\pi}$ as we described above.</p>
+<p>Are both steps necessary in RL optimization? The answer is no.</p>
+<h4 id="221-value-based-agent">2.2.1 Value-based Agent<a hidden class="anchor" aria-hidden="true" href="#221-value-based-agent">#</a></h4>
+<p>An agent can learn only the value function $V_\pi$, maintaining a table mapping $&lt;S, A&gt;$ to $V$. In each step, it picks the action that will maximize the ultimate value. In this type of work, the agent doesn&rsquo;t explicitly have a strategy or policy.</p>
+<p>$a_t = \text{argmax}\ V(a | s_t)$</p>
+<h4 id="222-policy-based-agent">2.2.2 Policy-based Agent<a hidden class="anchor" aria-hidden="true" href="#222-policy-based-agent">#</a></h4>
+<p>A policy agent directly learns the policy, and each step it outputs the distribution of the next action without knowing the value function.</p>
+<p>$a_t \sim P(a|s_t)$</p>
+<h4 id="223-actor-critic">2.2.3 Actor-Critic<a hidden class="anchor" aria-hidden="true" href="#223-actor-critic">#</a></h4>
+<p>An agent can learn both $\pi$ and $V_{\pi}$ as described above.</p>
 <ul>
-<li>Actor refers to learning of policy $\pi$</li>
-<li>Critic refers to learning of value function $V_\pi$</li>
+<li><strong>Actor</strong>: Learning of policy $\pi$.</li>
+<li><strong>Critic</strong>: Learning of value function $V_\pi$.</li>
 </ul>
-<h2 id="4-example-problem-cliff-walking-problem">4. Example Problem, Cliff Walking Problem<a hidden class="anchor" aria-hidden="true" href="#4-example-problem-cliff-walking-problem">#</a></h2>
-<p>Now let&rsquo;s work on a problem together to walk through all the different pieces and optimization methods in RL. The Cliff Walking problem is a classic reinforcement learning (RL) environment introduced in Sutton &amp; Barto’s book, “Reinforcement Learning: An Introduction.”</p>
-<h3 id="41-problem-statement">4.1 Problem Statement:<a hidden class="anchor" aria-hidden="true" href="#41-problem-statement">#</a></h3>
+<h2 id="3-example-problem-cliff-walking-problem">3. Example Problem, Cliff Walking Problem<a hidden class="anchor" aria-hidden="true" href="#3-example-problem-cliff-walking-problem">#</a></h2>
+<p>Let&rsquo;s explore a problem to illustrate the various components and optimization methods in RL. The Cliff Walking problem is a classic reinforcement learning environment introduced in Sutton &amp; Barto’s book, <em>Reinforcement Learning: An Introduction</em>.</p>
+<h3 id="31-problem-statement">3.1 Problem Statement:<a hidden class="anchor" aria-hidden="true" href="#31-problem-statement">#</a></h3>
+<p><img alt="Cliff Walking Figure" loading="lazy" src="/images/cliff-walking.png"></p>
 <ul>
-<li>The world is represented as a 4×12 grid world.</li>
+<li>The world is represented as a 4×12 grid.</li>
 <li>The start state is at the bottom-left corner $(3, 0)$, and the goal state is at the bottom-right corner $(3, 11)$.</li>
-<li>The bottom row between the start and goal is called the cliff $(3, 1-10)$ — if the agent steps into any of these cliff cells, it falls off, receives a large negative reward (e.g., -100), and is reset to the start.</li>
+<li>The bottom row between the start and goal is referred to as the cliff $(3, 1-10)$. If the agent steps into any of these cliff cells, it falls off, receives a large negative reward (e.g., -100), and is reset to the start.</li>
 <li>Each non-terminal move incurs a reward of -1.</li>
 </ul>
-<p>Now let&rsquo;s map this problem statement to different components of RL system.</p>
+<p>Mapping this problem to RL components:</p>
 <ul>
-<li>$Agent$, the robot that exists in the grid world, the agent needs to find a path from start position to end position to collect the rewards.</li>
-<li>$Environment$, the 4x12 grid world, as well as the transition and reward for each move. This environment is fully observable and deterministic.</li>
-<li>$State$, the state space is all the possible locations of the agent on the grid, there are 48 grids and minus the 10 cliff grids, there are 38 possible grids.</li>
-<li>$Action$, the action space is all the possible moves the agent can take. There are 4 possible actions, <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>.</li>
-<li>$Reward$, a scalar signal from the environment for the agent&rsquo;s each move. We can define it as:
+<li><strong>Agent</strong>: The robot navigating the grid, aiming to find a path from the start to the goal while maximizing rewards.</li>
+<li><strong>Environment</strong>: The 4x12 grid world, including transition dynamics and rewards for each move. This environment is fully observable and deterministic.</li>
+<li><strong>State</strong>: The state space comprises all possible locations of the agent on the grid. There are 48 grid cells, excluding the 10 cliff cells, resulting in 38 possible states.</li>
+<li><strong>Action</strong>: The action space consists of four possible moves: <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>.</li>
+<li><strong>Reward</strong>: A scalar signal from the environment for each move:
 <ul>
 <li>-1 for each normal move.</li>
-<li>-100 if the agent fells into the cliff.</li>
-<li>0 upon reaching the goal location.</li>
+<li>-100 if the agent falls into the cliff.</li>
+<li>0 upon reaching the goal.</li>
 </ul>
 </li>
-<li>$Policy$, the strategy the agent should take to reach the goal state. Here it should be a mapping from $state$ to $action$, here it tells what direction should the agent take in each grid cell. For example, <code>(3, 0) -&gt; MOVE UP</code>. The end goal for this problem is to find such a policy.</li>
+<li><strong>Policy</strong>: The strategy the agent should adopt to reach the goal state. It maps states to actions, indicating the direction the agent should take in each grid cell, e.g., <code>(3, 0) -&gt; MOVE UP</code>. The objective is to discover such a policy.</li>
 </ul>
-<h4 id="411-define-the-environemnt">4.1.1 Define the Environemnt<a hidden class="anchor" aria-hidden="true" href="#411-define-the-environemnt">#</a></h4>
-<p>We can define the  environment as following.</p>
+<h3 id="32-python-implementation">3.2 Python Implementation<a hidden class="anchor" aria-hidden="true" href="#32-python-implementation">#</a></h3>
+<h4 id="321-cliff-walking-environment">3.2.1 Cliff Walking Environment<a hidden class="anchor" aria-hidden="true" href="#321-cliff-walking-environment">#</a></h4>
+<p>The environment can be defined as follows:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CliffWalk</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, height, width, start, end, cliff):
 </span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>height <span style="color:#f92672">=</span> height
@@ -419,12 +450,7 @@ $$</p>
 </span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>cliff <span style="color:#f92672">=</span> set(cliff)
 </span></span><span style="display:flex;"><span>        
 </span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>actions <span style="color:#f92672">=</span> [(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>), (<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>), (<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>), (<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>)]  <span style="color:#75715e"># up, down, left, right</span>
-</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>reset()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">reset</span>(self):
-</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>agent_pos <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>start
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>agent_pos
-</span></span></code></pre></div><p>Then we can define the cells for start, end and cliff cells, and initialize a environment.</p>
+</span></span></code></pre></div><p>Initialize the environment with specified start, end, and cliff cells:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>start <span style="color:#f92672">=</span> (<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">0</span>)
 </span></span><span style="display:flex;"><span>end <span style="color:#f92672">=</span> (<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">11</span>)
 </span></span><span style="display:flex;"><span>height <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>
@@ -433,17 +459,17 @@ $$</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>env <span style="color:#f92672">=</span> CliffWalk(height, width, start, end, cliff_cells)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check github for visualization code.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check GitHub for visualization code.</span>
 </span></span><span style="display:flex;"><span>env<span style="color:#f92672">.</span>render_plot()
 </span></span></code></pre></div><p><img alt="Cliff Walking Visualization" loading="lazy" src="/images/CliffWalking-04-08-2025_10_12_AM.png"></p>
-<h4 id="412-define-the-step-function">4.1.2 Define the Step function<a hidden class="anchor" aria-hidden="true" href="#412-define-the-step-function">#</a></h4>
-<p>Next, we define rules and rewards for the agent&rsquo;s action.</p>
+<h4 id="322-define-the-step-function">3.2.2 Define the Step Function<a hidden class="anchor" aria-hidden="true" href="#322-define-the-step-function">#</a></h4>
+<p>Next, define the rules and rewards for the agent&rsquo;s actions:</p>
 <ul>
-<li>In <code>self.actions</code> we defined 4 type of actions, each representing walking 1 step in the direction.</li>
-<li>The <code>step</code> function takes in a current location <code>(i, j)</code> and <code>action</code> index, execute it and returns a tuple representing:
+<li><code>self.actions</code> defines four types of actions, each representing a step in a direction.</li>
+<li>The <code>step</code> function takes the current location <code>(i, j)</code> and action index, executes it, and returns a tuple representing:
 <ul>
-<li>The agents new position after the action</li>
-<li>Reward of current action</li>
+<li>The agent&rsquo;s new position after the action.</li>
+<li>The reward for the current action.</li>
 </ul>
 </li>
 </ul>
@@ -461,56 +487,60 @@ $$</p>
 </span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> (ni, nj), <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Move out of grid, get -1 reward</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (i, j), <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
-</span></span></code></pre></div><p>The moving rules and rewards are:</p>
+</span></span></code></pre></div><p>The movement rules and rewards are:</p>
 <ul>
-<li>Agent received -1 for each normal move.</li>
-<li>Agent received -100 if fell off the cliff.</li>
-<li>Agent received 0 if reaching the goal.</li>
-<li>If the agent moved out of the grid, it stayed still in the same grid and still received -1.</li>
+<li>The agent receives -1 for each normal move.</li>
+<li>The agent receives -100 if it falls off the cliff.</li>
+<li>The agent receives 0 upon reaching the goal.</li>
+<li>If the agent moves out of the grid, it remains in the same cell and still receives -1.</li>
 </ul>
-<p>Now we introduced the environment setup of the cliff walking problem, now let&rsquo;s try to solve it with three classes of RL methods, which is dynamic programming, monte-carlo and temporal-difference methods. Comparison between these three methods will be given at the end of the article.</p>
-<h2 id="5-dynamic-programming-methods">5. Dynamic Programming Methods<a hidden class="anchor" aria-hidden="true" href="#5-dynamic-programming-methods">#</a></h2>
-<h3 id="51-introduction">5.1 Introduction<a hidden class="anchor" aria-hidden="true" href="#51-introduction">#</a></h3>
-<h3 id="511-markov-property">5.1.1 Markov Property<a hidden class="anchor" aria-hidden="true" href="#511-markov-property">#</a></h3>
-<p>A Markov decision process(MDP) is defined by 5 elements:
+<p>With the environment set up, we can now solve the problem using three RL methods: dynamic programming, Monte Carlo, and temporal-difference methods. A comparison of these methods will be provided at the end of the article.</p>
+<h2 id="4-dynamic-programming-methods">4. Dynamic Programming Methods<a hidden class="anchor" aria-hidden="true" href="#4-dynamic-programming-methods">#</a></h2>
+<h3 id="41-introduction">4.1 Introduction<a hidden class="anchor" aria-hidden="true" href="#41-introduction">#</a></h3>
+<p>Dynamic programming (DP) is a method used in reinforcement learning to solve Markov decision processes (MDPs) by breaking them down into simpler subproblems. It works by iteratively improving the value function, which estimates the expected return of states, and deriving an optimal policy from these values. DP requires a complete model of the environment, including the transition probabilities and reward functions.</p>
+<h3 id="411-markov-property">4.1.1 Markov Property<a hidden class="anchor" aria-hidden="true" href="#411-markov-property">#</a></h3>
+<p>A Markov decision process (MDP) is defined by five elements:
 $$
 MDP = &lt;S, A, P, R, \gamma&gt;
 $$</p>
 <ul>
 <li>$S$: state space</li>
 <li>$A$: action space</li>
-<li>$P$: <strong>transition probability</strong> from a state and action to its next state, $p(s_{t+1}|st, at)$</li>
-<li>$R$: <strong>reward function</strong> immediate reward after a transition, $r(s_{t+1},st, at)$</li>
-<li>$\gamma$: <strong>discount factor</strong> that weights the importance of future reward.</li>
+<li>$P$: <strong>transition probability</strong> from a state and action to its next state, $p(s_{t+1}|s_t, a_t)$</li>
+<li>$R$: <strong>reward function</strong> immediate reward after a transition, $r(s_{t+1}, s_t, a_t)$</li>
+<li>$\gamma$: <strong>discount factor</strong> that weights the importance of future rewards</li>
 </ul>
-<p>We define a deicision process has <strong>Markov Property</strong> if its next state and reward only depend on its current state and action, not the full history. We can see the cliff walking problem suffices the <strong>markovian propterty</strong>.</p>
-<h3 id="512-bellman-optimal-function">5.1.2 Bellman Optimal Function<a hidden class="anchor" aria-hidden="true" href="#512-bellman-optimal-function">#</a></h3>
-<p>We define the optimal value function is:
+<p>A decision process has the <strong>Markov Property</strong> if its next state and reward depend only on its current state and action, not the full history. The cliff walking problem satisfies the <strong>Markovian property</strong>.</p>
+<h3 id="412-bellman-optimal-function">4.1.2 Bellman Optimal Function<a hidden class="anchor" aria-hidden="true" href="#412-bellman-optimal-function">#</a></h3>
+<p>The Bellman optimality equation defines the optimal value function as:
 $$
-V^{<em>}(s) = maxV_\pi(s)
+V^{<em>}(s) = \max V_\pi(s)
 $$
-Here we searched a policy $\pi$ to maximize the state $V$, the result policy is our optimal policy.
+Here, we search for a policy $\pi$ that maximizes the value of state $V$. The resulting policy is our optimal policy.
 $$
-\pi^{</em>}(s) = argmaxV_\pi(s)
+\pi^{</em>}(s) = \arg\max V_\pi(s)
 $$
-For each state $s$, we searched over its possible actions to maximize the value:
+For each state $s$, we search over its possible actions to maximize the value:
 $$
-\pi^{<em>}(a | s) = 1, a = argmaxQ^</em>(s, a)
+\pi^{<em>}(a | s) = 1, \text{ if } a = \arg\max Q^</em>(s, a)
 $$</p>
-<h3 id="52-value-iteration">5.2 Value Iteration<a hidden class="anchor" aria-hidden="true" href="#52-value-iteration">#</a></h3>
-<h4 id="521-value-iteration-for-cliff-walking">5.2.1 Value Iteration for Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#521-value-iteration-for-cliff-walking">#</a></h4>
+<p>Dynamic programming utilizes these equations to iteratively update the value function and improve the policy until convergence, ensuring that the policy becomes optimal.</p>
+<h3 id="42-value-iteration">4.2 Value Iteration<a hidden class="anchor" aria-hidden="true" href="#42-value-iteration">#</a></h3>
+<p>Value iteration is a dynamic programming method used to compute the optimal policy and value function for a Markov decision process (MDP). It iteratively updates the value function by considering the expected returns of all possible actions at each state and selecting the action that maximizes this return.</p>
+<h4 id="421-value-iteration-for-cliff-walking">4.2.1 Value Iteration for Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#421-value-iteration-for-cliff-walking">#</a></h4>
 <ul>
 <li>Initialize each state&rsquo;s value function to 0: $V(s) = 0$</li>
-<li>For each state $s_t$
+<li>For each state $s_t$:
 <ul>
-<li>seach over its possible actions $a_t$, each $a_t$ leads to a new state $s_{t+1}$</li>
-<li>update current state&rsquo;s value function with the action that beares largest reward. $V(s_t) = \underset{a}{max}(r_a + V(s_{t+1}))$</li>
+<li>Search over its possible actions $a_t$, each $a_t$ leads to a new state $s_{t+1}$</li>
+<li>Update the current state&rsquo;s value function with the action that bears the largest reward: $V(s_t) = \underset{a}{\max}(r_a + V(s_{t+1}))$</li>
 </ul>
 </li>
 <li>Repeat the previous steps until convergence</li>
 </ul>
-<h4 id="522-python-implementation-of-value-iteration-for-cliff-walking">5.2.2 Python Implementation of Value Iteration for Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#522-python-implementation-of-value-iteration-for-cliff-walking">#</a></h4>
-<p>Below we defined one iteration for value update:</p>
+<h4 id="422-python-implementation-of-value-iteration-for-cliff-walking">4.2.2 Python Implementation of Value Iteration for Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#422-python-implementation-of-value-iteration-for-cliff-walking">#</a></h4>
+<h5 id="4221-one-epoch-update">4.2.2.1 One Epoch Update<a hidden class="anchor" aria-hidden="true" href="#4221-one-epoch-update">#</a></h5>
+<p>Below is the implementation for one iteration of value update:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">value_iterate</span>(env, V, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>):
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Run one epoch of value iteration&#34;&#34;&#34;</span>
 </span></span><span style="display:flex;"><span>    V_new <span style="color:#f92672">=</span> V<span style="color:#f92672">.</span>copy()
@@ -524,6 +554,7 @@ $$</p>
 </span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> a <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">4</span>):
 </span></span><span style="display:flex;"><span>                    (i_new, j_new), reward<span style="color:#f92672">=</span> env<span style="color:#f92672">.</span>step(i, j, a)
 </span></span><span style="display:flex;"><span>                    values<span style="color:#f92672">.</span>append(V[(i_new, j_new)] <span style="color:#f92672">*</span> gamma <span style="color:#f92672">+</span> reward)
+</span></span><span style="display:flex;"><span>                
 </span></span><span style="display:flex;"><span>                max_value <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>max(values)
 </span></span><span style="display:flex;"><span>                best_actions <span style="color:#f92672">=</span> [a <span style="color:#66d9ef">for</span> a, v <span style="color:#f92672">in</span> enumerate(values) <span style="color:#66d9ef">if</span> v <span style="color:#f92672">==</span> max_value]
 </span></span><span style="display:flex;"><span>                
@@ -533,11 +564,12 @@ $$</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> V_new, policy, delta
 </span></span></code></pre></div><ul>
-<li><code>V</code> is the value function, its key is a gird location of <code>(i, j)</code>, value is initlized to 0</li>
-<li>We iterate over all grid locations that&rsquo;s not a cliff or goal location, for each grid, we iterated over its 4 actions, and pick the action with the largest value to update current value.</li>
-<li>We used <code>max(abs(V_new[(i, j)] - V[i, j]))</code> as the difference between value iteartions.</li>
-<li>Value iteration does not explicitly optimize the policy, instead it&rsquo;s learnt implicitily by selecting over an action that maximized its next value state.</li>
+<li><code>V</code> is the value function, its key is a grid location of <code>(i, j)</code>, and its value is initialized to 0.</li>
+<li>We iterate over all grid locations that are not cliffs or goal locations. For each grid, we iterate over its 4 actions and pick the action with the largest value to update the current value.</li>
+<li>We use <code>max(abs(V_new[(i, j)] - V[i, j]))</code> as the difference between value iterations.</li>
 </ul>
+<p>Value iteration does not explicitly optimize the policy; instead, it is learned implicitly by selecting the action that maximizes its next value state.</p>
+<h5 id="4222-training">4.2.2.2 Training<a hidden class="anchor" aria-hidden="true" href="#4222-training">#</a></h5>
 <p>To train the value iteration until convergence:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">value_iteration_train</span>(env, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>, tolerance<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-6</span>):
 </span></span><span style="display:flex;"><span>    progress_data <span style="color:#f92672">=</span> []
@@ -552,16 +584,16 @@ $$</p>
 </span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> progress_data
 </span></span></code></pre></div><ul>
-<li><code>gamma</code> is a discounted factor that defined the future reward&rsquo;s current value</li>
-<li>The training iteration stoped until the difference between two value functions are <code>&lt;tolerance</code>.</li>
-<li>We returned the <code>V</code> and <code>policy</code> data during training for evaluation purpose</li>
+<li><code>gamma</code> is a discount factor that defines the current value of future rewards.</li>
+<li>The training iteration stops when the difference between two value functions is <code>&lt;tolerance</code>.</li>
+<li>We return the <code>V</code> and <code>policy</code> data during training for evaluation purposes.</li>
 </ul>
-<h4 id="523-result-and-visualization">5.2.3 Result and Visualization<a hidden class="anchor" aria-hidden="true" href="#523-result-and-visualization">#</a></h4>
-<p>We run training using <code>gamma=0.9</code>, it converges in 15 epoches</p>
+<h5 id="423-result-and-visualization">4.2.3 Result and Visualization<a hidden class="anchor" aria-hidden="true" href="#423-result-and-visualization">#</a></h5>
+<p>We run training using <code>gamma=0.9</code>, and it converges in 15 epochs.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dp_progress <span style="color:#f92672">=</span> value_iteration_train(env, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>, tolerance<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-6</span>)
-</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Trained </span><span style="color:#e6db74">{</span>len(dp_progress)<span style="color:#e6db74">}</span><span style="color:#e6db74"> epoches&#34;</span>)
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Trained 15 epoches
-</span></span></code></pre></div><p>We visulize both the value function and policy in epoch <code>1, 7, 14</code></p>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Trained </span><span style="color:#e6db74">{</span>len(dp_progress)<span style="color:#e6db74">}</span><span style="color:#e6db74"> epochs&#34;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Trained 15 epochs
+</span></span></code></pre></div><p>We visualize both the value function and policy in epochs <code>1, 7, 14</code>:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>epoches <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">14</span>]
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i, ax <span style="color:#f92672">in</span> enumerate(axs):
 </span></span><span style="display:flex;"><span>    iter <span style="color:#f92672">=</span> epoches[i <span style="color:#f92672">//</span> <span style="color:#ae81ff">2</span>]
@@ -572,54 +604,55 @@ $$</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>tight_layout()
 </span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>show()
-</span></span></code></pre></div><p>From the visuliaztion:</p>
+</span></span></code></pre></div><p>From the visualization:</p>
 <ul>
-<li>In epoch 1, the agent learnt to avoid the cliff</li>
-<li>In epoch 7, the agent learnt the best actions on right side of the grid, which is either take <code>DOWN</code> or <code>RIGHT</code> action to reach the goal grid.</li>
-<li>In eppch 14, the value function converges, which the optimal path now is to take <code>UP</code> from start then always take <code>RIGHT</code> until close to the goal.</li>
+<li>In epoch 1, the agent learns to avoid the cliff.</li>
+<li>In epoch 7, the agent learns the best actions on the right side of the grid, which are either to take <code>DOWN</code> or <code>RIGHT</code> actions to reach the goal grid.</li>
+<li>In epoch 14, the value function converges, and the optimal path is to take <code>UP</code> from the start and then always take <code>RIGHT</code> until close to the goal.</li>
 </ul>
 <p><img alt="Value Iteration Visualization" loading="lazy" src="/images/CliffWalking-04-08-2025_01_17_PM.png"></p>
-<h3 id="53-policy-iteration">5.3 Policy Iteration<a hidden class="anchor" aria-hidden="true" href="#53-policy-iteration">#</a></h3>
-<p>In previous <strong>Value Iteration</strong> method, during iterations we only updated the value function until convergence, the policy is derived implicitely from the value function. So can we optimize the policy directly? This comes into another dynamic programming method in MDPs, <strong>Policy Iteration</strong>.</p>
+<h3 id="43-policy-iteration">4.3 Policy Iteration<a hidden class="anchor" aria-hidden="true" href="#43-policy-iteration">#</a></h3>
+<p>In the previous <strong>Value Iteration</strong> method, during iterations, we only updated the value function until convergence. The policy is derived implicitly from the value function. So, can we optimize the policy directly? This leads us to another dynamic programming method in MDPs, <strong>Policy Iteration</strong>.</p>
 <p>A policy iteration consists of two parts:</p>
 <ol>
 <li>
-<p><strong>Policy Evaluation</strong>, given a policy $\pi$, compute its state-value function $V^{\pi}(s)$, which is the expected return of following the policy $\pi$.
+<p><strong>Policy Evaluation</strong>: Given a policy $\pi$, compute its state-value function $V^{\pi}(s)$, which is the expected return of following the policy $\pi$.
 $$
 V(s_t) = \sum P(s_{t+1} | s_t, \pi) * [r(s_t, \pi, s_{t+1}) + \gamma * V(s_{t+1})]
 $$</p>
 </li>
 <li>
-<p><strong>Policy Improvment</strong>, update the agent&rsquo;s policy respect to the current value function.
+<p><strong>Policy Improvement</strong>: Update the agent&rsquo;s policy with respect to the current value function.
 $$
 \pi_{new}(s) = \underset{a}{argmax}\ \sum P(s_{t+1} | s_t, \pi) * [r(s_t, \pi, s_{t+1}) + \gamma * V(s_{t+1})]
 $$</p>
 </li>
 </ol>
-<h4 id="531-policy-iteration-for-cliff-walking">5.3.1 Policy Iteration for Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#531-policy-iteration-for-cliff-walking">#</a></h4>
+<h4 id="431-policy-iteration-for-cliff-walking">4.3.1 Policy Iteration for Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#431-policy-iteration-for-cliff-walking">#</a></h4>
 <ul>
-<li>Initialization:
+<li>Step 0, Initialization:
 <ul>
-<li>Intialize each state&rsquo;s value function to 0: $V(s) = 0$</li>
-<li>Initialize policy to take all 4 actions in all states.</li>
+<li>Initialize each state&rsquo;s value function to 0: $V(s) = 0$</li>
+<li>Initialize the policy to take all 4 actions in all states.</li>
 </ul>
 </li>
-<li>Step 1, <strong>policy evaluation</strong>, for each state $s_t$
+<li>Step 1, <strong>policy evaluation</strong>, for each state $s_t$:
 <ul>
-<li>Search over its policy&rsquo;s actions $a_t$  each $a_t$ leads to a new state $s_{t+1}$</li>
-<li>Update current state&rsquo;s value function with the mean reward of policy actions. $V(s_t) = \underset{a}{mean}(r_a + \gamma * V(s_{t+1}))$</li>
-<li>Repeat until the value function convergent.</li>
+<li>Search over its policy&rsquo;s actions $a_t$, each $a_t$ leads to a new state $s_{t+1}$.</li>
+<li>Update the current state&rsquo;s value function with the mean reward of policy actions. $V(s_t) = \underset{a}{mean}(r_a + \gamma * V(s_{t+1}))$</li>
+<li>Repeat until the value function converges.</li>
 </ul>
 </li>
-<li>Step 2, <strong>policy improvement</strong>, for each state $s_t$
+<li>Step 2, <strong>policy improvement</strong>, for each state $s_t$:
 <ul>
-<li>Seach over current policy&rsquo;s actions $a_t$ at each $s_t$, compute its value function.</li>
+<li>Search over the current policy&rsquo;s actions $a_t$ at each $s_t$, compute its value function.</li>
 <li>Update the policy $\pi(s_t)$ by only keeping actions with the largest value function.</li>
 </ul>
 </li>
-<li>Repeat step 1 and 2 until the policy doens&rsquo;t change.</li>
+<li>Repeat steps 1 and 2 until the policy doesn&rsquo;t change.</li>
 </ul>
-<h4 id="532-python-implementation-of-policy-iteration-for-cliff-walking">5.3.2 Python Implementation of Policy Iteration for Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#532-python-implementation-of-policy-iteration-for-cliff-walking">#</a></h4>
+<h4 id="432-python-implementation-of-policy-iteration-for-cliff-walking">4.3.2 Python Implementation of Policy Iteration for Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#432-python-implementation-of-policy-iteration-for-cliff-walking">#</a></h4>
+<h5 id="4321-policy-evaluation">4.3.2.1 Policy Evaluation<a hidden class="anchor" aria-hidden="true" href="#4321-policy-evaluation">#</a></h5>
 <p>Let&rsquo;s first implement the <strong>policy evaluation</strong> function:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">policy_eval</span>(env, V, policy, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>, tolerance<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-4</span>):
 </span></span><span style="display:flex;"><span>    V_new <span style="color:#f92672">=</span> V<span style="color:#f92672">.</span>copy()
@@ -642,14 +675,15 @@ $$</p>
 </span></span><span style="display:flex;"><span>        V <span style="color:#f92672">=</span> V_new<span style="color:#f92672">.</span>copy()
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> V_new
 </span></span></code></pre></div><ul>
-<li>This function is very similar to the <code>value_iterate</code> function in value interation, except one major difference:
+<li>This function is very similar to the <code>value_iterate</code> function in value iteration, except for one major difference:
 <ul>
-<li>In <code>value_iterate</code>, we compute value functions among all actions and used <code>np.max(values)</code> to pick the best action, which means we are implicitely changing the policy using <code>argmax</code>.</li>
-<li>In <code>policy_eval</code>, we only iterate actions in existing policy <code>policy[(i, j)]</code>, and used <code>np.mean</code> to calculate the expected value function, which means we are only doing evaluation instead of policy optimization here.</li>
+<li>In <code>value_iterate</code>, we compute value functions among all actions and use <code>np.max(values)</code> to pick the best action, which means we are implicitly changing the policy using <code>argmax</code>.</li>
+<li>In <code>policy_eval</code>, we only iterate actions in the existing policy <code>policy[(i, j)]</code>, and use <code>np.mean</code> to calculate the expected value function, which means we are only doing evaluation instead of policy optimization here.</li>
 </ul>
 </li>
-<li>The function returned a new value function <code>V_new</code> after convergence.</li>
+<li>The function returns a new value function <code>V_new</code> after convergence.</li>
 </ul>
+<h5 id="4322-policy-improvement">4.3.2.2 Policy Improvement<a hidden class="anchor" aria-hidden="true" href="#4322-policy-improvement">#</a></h5>
 <p>Then let&rsquo;s implement the <strong>policy improvement</strong> step:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">policy_improve</span>(env, V, policy, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>):
 </span></span><span style="display:flex;"><span>    policy_new <span style="color:#f92672">=</span> defaultdict(list)
@@ -665,13 +699,15 @@ $$</p>
 </span></span><span style="display:flex;"><span>                
 </span></span><span style="display:flex;"><span>                max_val <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>max(values)
 </span></span><span style="display:flex;"><span>                best_actions <span style="color:#f92672">=</span> [a <span style="color:#66d9ef">for</span> a, v <span style="color:#f92672">in</span> enumerate(values) <span style="color:#66d9ef">if</span> v <span style="color:#f92672">==</span> max_val]
+</span></span><span style="display:flex;"><span>                
 </span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> set(best_actions) <span style="color:#f92672">!=</span> set(policy[(i, j)]):
 </span></span><span style="display:flex;"><span>                    policy_stable <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
 </span></span><span style="display:flex;"><span>                policy_new[(i, j)] <span style="color:#f92672">=</span> best_actions
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> policy_new, policy_stable
 </span></span></code></pre></div><ul>
-<li>The <code>policy_improve</code> is a one step optimization, it takes in the current value function <code>V</code>, picked the <code>argmax</code> action to update the policy, it also takes in current policy <code>policy</code> to compare whether there is any changes between the two policy. It returns both the updated policy <code>policy_new</code> and a boolean indicated whether the policy changed during optimization.</li>
+<li>The <code>policy_improve</code> is a one-step optimization, it takes in the current value function <code>V</code>, picked the <code>argmax</code> action to update the policy, it also takes in the current policy <code>policy</code> to compare whether there is any change between the two policies. It returns both the updated policy <code>policy_new</code> and a boolean indicating whether the policy changed during optimization.</li>
 </ul>
+<h5 id="4323-training">4.3.2.3 Training<a hidden class="anchor" aria-hidden="true" href="#4323-training">#</a></h5>
 <p>Combining these two sub-steps, we can train using policy iteration:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">policy_iteration_train</span>(env, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>, tolerance<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-6</span>):
 </span></span><span style="display:flex;"><span>    V <span style="color:#f92672">=</span> defaultdict(float)
@@ -690,18 +726,18 @@ $$</p>
 </span></span><span style="display:flex;"><span>        idx <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> progress_data
 </span></span></code></pre></div><ul>
-<li>For all states, value function <code>V</code> is default to 0, policy is default to all 4 actions.</li>
-<li>The training iteration stoped until the the policy no longer changed.</li>
+<li>For all states, the value function <code>V</code> is default to 0, and the policy is default to all 4 actions.</li>
+<li>The training iteration stops until the policy no longer changes.</li>
 </ul>
-<h4 id="533-results-and-evaluation">5.3.3 Results and Evaluation<a hidden class="anchor" aria-hidden="true" href="#533-results-and-evaluation">#</a></h4>
-<p>We run training using gamma=0.9, it converges in 6 epoches</p>
+<h5 id="4324-results-and-evaluation">4.3.2.4 Results and Evaluation<a hidden class="anchor" aria-hidden="true" href="#4324-results-and-evaluation">#</a></h5>
+<p>We run training using <code>gamma=0.9</code>, and it converges in 6 epochs.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dp_progress <span style="color:#f92672">=</span> policy_iteration_train(env, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>, tolerance<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-6</span>)
-</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Trained </span><span style="color:#e6db74">{</span>len(dp_progress)<span style="color:#e6db74">}</span><span style="color:#e6db74"> epoches&#34;</span>)
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Trained 6 epoches
-</span></span></code></pre></div><p>We also visualize the value function and policy in epoch <code>1, 3, 5</code>:</p>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Trained </span><span style="color:#e6db74">{</span>len(dp_progress)<span style="color:#e6db74">}</span><span style="color:#e6db74"> epochs&#34;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Trained 6 epochs
+</span></span></code></pre></div><p>We also visualize the value function and policy in epochs <code>1, 3, 5</code>:</p>
 <ul>
-<li>In epoch 1, because the initialized policy includes all actions, this leads to grid in the <code>i=2</code> row has a low value function as it has 25% of falling into the cliff and incur <code>-100</code> reward, so the learnt policy for most grids is to move upward and avoid the cliff.</li>
-<li>In later epoches, since the policy no longer includes actions that leads to fall off the cliff, the value function improved for all grids, also it learnt the optimal path towards the goal grid.</li>
+<li>In epoch 1, because the initialized policy includes all actions, this leads to grid in the <code>i=2</code> row having a low value function as it has 25% of falling into the cliff and incurring <code>-100</code> reward, so the learned policy for most grids is to move upward and avoid the cliff.</li>
+<li>In later epochs, since the policy no longer includes actions that lead to falling off the cliff, the value function improves for all grids, and it learns the optimal path towards the goal grid.</li>
 </ul>
 <p><img alt="Policy Iteration Visualization" loading="lazy" src="/images/CliffWalking-04-08-2025_02_49_PM.png"></p>
 <h2 id="6-monte-carlo-methods">6. Monte-Carlo Methods<a hidden class="anchor" aria-hidden="true" href="#6-monte-carlo-methods">#</a></h2>
@@ -712,13 +748,13 @@ $$</p>
 </ul>
 <p>What if the agent is in another environment that itself doesn&rsquo;t know any of such information ahead? Assume the agent was placed in the <code>start</code> location, with no knowledge about:</p>
 <ul>
-<li>where is the <code>goal</code> grid, and how to reach it.</li>
+<li>Where is the <code>goal</code> grid, and how to reach it.</li>
 <li>Which grid it will go to if taking an action and what reward it will get.</li>
 </ul>
-<p>Then the agent need to interact with the environment to generate <strong>episodes</strong> (sequence of states, actions, rewards) until it reached the <code>goal</code> grid, and learn these information and otpimize the policy during the interaction.</p>
-<p>Compare the two methods, DP is like a <strong>planner</strong> who knows the full map and compute the best path. Monte-Carlo is like an <strong>explorer</strong> that tries different routes and keep optimizing the policy.</p>
+<p>Then the agent needs to interact with the environment to generate <strong>episodes</strong> (sequence of states, actions, rewards) until it reached the <code>goal</code> grid, and learn these information and optimize the policy during the interaction.</p>
+<p>Compare the two methods, DP is like a <strong>planner</strong> who knows the full map and computes the best path. Monte-Carlo is like an <strong>explorer</strong> that tries different routes and keeps optimizing the policy.</p>
 <h3 id="61-interaction-environment">6.1 Interaction Environment<a hidden class="anchor" aria-hidden="true" href="#61-interaction-environment">#</a></h3>
-<p>We first need to chang the <code>CliffWalk</code> environment to mimic an interaction environment.</p>
+<p>We first need to change the <code>CliffWalk</code> environment to mimic an interaction environment.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CliffWalk</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, height, width, start, end, cliff):
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span> <span style="color:#75715e"># Ignore previous codes</span>
@@ -738,6 +774,9 @@ $$</p>
 </span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>reset()
 </span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>start, <span style="color:#f92672">-</span><span style="color:#ae81ff">100</span>, <span style="color:#66d9ef">False</span>
 </span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (ni, nj) <span style="color:#f92672">==</span> self<span style="color:#f92672">.</span>end:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> (ni, nj), <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>        
 </span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Move, get -1 reward</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&lt;=</span> ni <span style="color:#f92672">&lt;</span> self<span style="color:#f92672">.</span>height <span style="color:#f92672">and</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&lt;=</span> nj <span style="color:#f92672">&lt;</span> self<span style="color:#f92672">.</span>width:
 </span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>agent_pos <span style="color:#f92672">=</span> ni, nj
@@ -745,32 +784,30 @@ $$</p>
 </span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Move out of grid, get -1 reward</span>
 </span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>agent_pos <span style="color:#f92672">=</span> i, j
 </span></span><span style="display:flex;"><span>        done, reward <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>agent_pos <span style="color:#f92672">==</span> self<span style="color:#f92672">.</span>end:
-</span></span><span style="display:flex;"><span>            done, reward <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>, <span style="color:#ae81ff">0</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>agent_pos, reward, done
-</span></span></code></pre></div><p>Compare the new implementation of <code>step</code> function with previous one:</p>
+</span></span></code></pre></div><p>Compare the new implementation of <code>step</code> function with the previous one:</p>
 <ul>
 <li>The new implementation only takes an <code>action</code> index, it tracks the agent&rsquo;s state using <code>self.agent_pos</code></li>
-<li>We are forbidden to compute the state and reward for any $&lt;state, action&gt;$ now. The agent has to reach to a specific $s_t$ and take an $a_t$, call <code>step</code> to finally get the $s_{t+1}, r_t$ from interaction.</li>
-<li>The <code>step</code> function returns a boolean varaible <code>done</code> indicating whether the agent reached the <code>goal</code> grid</li>
+<li>We are forbidden to compute the state and reward for any $&lt;state, action&gt;$ now. The agent has to reach a specific $s_t$ and take an $a_t$, call <code>step</code> to finally get the $s_{t+1}, r_t$ from interaction.</li>
+<li>The <code>step</code> function returns a boolean variable <code>done</code> indicating whether the agent reached the <code>goal</code> grid</li>
 </ul>
 <h3 id="62-monte-carlo-simulation">6.2 Monte-Carlo Simulation<a hidden class="anchor" aria-hidden="true" href="#62-monte-carlo-simulation">#</a></h3>
-<p>Monte Carlo (MC) methods learn from complete episodes of interaction with the environment. The core idea is to estimate the value of a $&lt;state, action&gt;$ pair by averaging the total return oberseved after visiting a state across multiple episodes.</p>
+<p>Monte Carlo (MC) methods learn from complete episodes of interaction with the environment. The core idea is to estimate the value of a $&lt;state, action&gt;$ pair by averaging the total return observed after visiting a state across multiple episodes.</p>
 <h3 id="621-epsilon-search-algorithm">6.2.1 $\epsilon$-search algorithm<a hidden class="anchor" aria-hidden="true" href="#621-epsilon-search-algorithm">#</a></h3>
-<p>In RL system, it&rsquo;s very common to face the exploration vs exploitation dillema:</p>
+<p>In RL systems, it&rsquo;s very common to face the exploration vs exploitation dilemma:</p>
 <ul>
 <li><strong>Exploitation</strong>: Pick the best known action so far (greedy)</li>
 <li><strong>Exploration</strong>: Try other actions to discover potentially better ones</li>
 </ul>
-<p>If the agent always acts greedily, it may get stuck in suboptimal path, without getting oppourtunity to discover potential better paths. The $\epsilon$-search try to balance this by introducing a random $\epsilon$, in each step:</p>
+<p>If the agent always acts greedily, it may get stuck in suboptimal paths, without getting opportunities to discover potentially better paths. The $\epsilon$-search tries to balance this by introducing a random $\epsilon$, in each step:</p>
 <ul>
-<li><strong>Exploration</strong>: With pobability $\epsilon$, choose a random action.</li>
-<li><strong>Exploitation</strong>: With probability $1 - \epsilon$, choose action with highest value: $a = argmax\ Q(s, a)$</li>
+<li><strong>Exploration</strong>: With probability $\epsilon$, choose a random action.</li>
+<li><strong>Exploitation</strong>: With probability $1 - \epsilon$, choose the action with the highest value: $a = argmax\ Q(s, a)$</li>
 </ul>
 <h3 id="622-monte-carlo-method-in-cliff-walking">6.2.2 Monte-Carlo method in Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#622-monte-carlo-method-in-cliff-walking">#</a></h3>
 <ul>
 <li>
-<p>Step 0, Initilization:</p>
+<p>Step 0, Initialization:</p>
 <ul>
 <li>Initialize a random value function: $Q(s, a)$</li>
 <li>Initialize an $\epsilon$-greedy policy</li>
@@ -779,20 +816,20 @@ $$</p>
 <li>
 <p>Step 1, Generate episodes:</p>
 <ul>
-<li>From the <code>start</code> state, follow current policy to generate full episode until the agent reached <code>goal</code> grid, we will get a sequence of $&lt;s_t, a_t, r_t&gt;$</li>
+<li>From the <code>start</code> state, follow the current policy to generate a full episode until the agent reaches the <code>goal</code> grid, we will get a sequence of $&lt;s_t, a_t, r_t&gt;$</li>
 </ul>
 </li>
 <li>
 <p>Step 2, Update value function: $Q(s, a)$</p>
 <ul>
-<li>For each $&lt;s_t, a_t&gt;$ pair in episode trace, compute its return by $G_t = r\ + \gamma*G_{t+1}$</li>
+<li>For each $&lt;s_t, a_t&gt;$ pair in the episode trace, compute its return by $G_t = r\ + \gamma*G_{t+1}$</li>
 <li>Update $Q(s, a)$ by averaging returns across multiple episodes.</li>
 </ul>
 </li>
 <li>
 <p>Step 3, Improve policy:</p>
 <ul>
-<li>The new policy is the $\epsilon$-greedy policy with updated value function $Q(s, a)$.</li>
+<li>The new policy is the $\epsilon$-greedy policy with the updated value function $Q(s, a)$.</li>
 </ul>
 </li>
 <li>
@@ -807,18 +844,19 @@ $$</p>
 </span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Random action</span>
 </span></span><span style="display:flex;"><span>        action <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">4</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Optimzed action</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Optimized action</span>
 </span></span><span style="display:flex;"><span>        max_val <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>max(action_values)
 </span></span><span style="display:flex;"><span>        best_actions <span style="color:#f92672">=</span> [i <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">4</span>) <span style="color:#66d9ef">if</span> action_values[i] <span style="color:#f92672">==</span> max_val]
+</span></span><span style="display:flex;"><span>        
 </span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Random pick among best actions</span>
 </span></span><span style="display:flex;"><span>        action <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>choice(best_actions)
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> action
 </span></span></code></pre></div><h4 id="632-mc-simulation">6.3.2 MC-Simulation<a hidden class="anchor" aria-hidden="true" href="#632-mc-simulation">#</a></h4>
 <p>This function simulates 1 episode of MC simulation.</p>
 <ul>
-<li>At the beginning, <code>env.reset()</code> set the agent to <code>start</code> state.</li>
-<li><code>Q</code> is the Value table, with key is the current location <code>(i, j)</code>, value is a list of size 4, the value at index <code>k</code> represents value for action <code>k</code>.</li>
-<li>The simulation stop after it reached the <code>goal</code> state.</li>
+<li>At the beginning, <code>env.reset()</code> sets the agent to the <code>start</code> state.</li>
+<li><code>Q</code> is the Value table, with the key being the current location <code>(i, j)</code>, and the value being a list of size 4, the value at index <code>k</code> represents the value for action <code>k</code>.</li>
+<li>The simulation stops after it reaches the <code>goal</code> state.</li>
 </ul>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">mc_simulation</span>(env, Q, epsilon<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>):
 </span></span><span style="display:flex;"><span>    state <span style="color:#f92672">=</span> env<span style="color:#f92672">.</span>reset()
@@ -855,8 +893,8 @@ $$</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Q, policy
 </span></span></code></pre></div><ul>
-<li><code>returns</code> is a dictionary, with key being a <code>&lt;state, action&gt;</code> combination, value being a list that stored its expected reward in each episode.</li>
-<li>For each episode, we traversed backwards, iteratively computing each state&rsquo;s value using function: $G_t = r_t + \gamma * G_{t+1}$.</li>
+<li><code>returns</code> is a dictionary, with the key being a <code>&lt;state, action&gt;</code> combination, and the value being a list that stores its expected reward in each episode.</li>
+<li>For each episode, we traversed backwards, iteratively computing each state&rsquo;s value using the function: $G_t = r_t + \gamma * G_{t+1}$.</li>
 </ul>
 <h4 id="634-monte-carlo-training">6.3.4 Monte-Carlo training<a hidden class="anchor" aria-hidden="true" href="#634-monte-carlo-training">#</a></h4>
 <p>Combining the previous steps, we can train the agent:</p>
@@ -878,31 +916,31 @@ $$</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> progress_data
 </span></span></code></pre></div><ul>
-<li><code>Q</code> is initilized by giving equal weights to each action.</li>
-<li>We set $\epsilon$ to decay over episodes, <code>epsilon = max(0.01, epsilon*0.99)</code>. In earlier epoches, the agent has no prior knowledge, so we enough more exploration, then in later epoches focus more on exploitation.</li>
+<li><code>Q</code> is initialized by giving equal weights to each action.</li>
+<li>We set $\epsilon$ to decay over episodes, <code>epsilon = max(0.01, epsilon*0.99)</code>. In earlier episodes, the agent has no prior knowledge, so we encourage more exploration, then in later episodes focus more on exploitation.</li>
 </ul>
 <h4 id="635-results-and-visualizations">6.3.5 Results and Visualizations<a hidden class="anchor" aria-hidden="true" href="#635-results-and-visualizations">#</a></h4>
 <p>We run MC sampling for 5000 episodes:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>progress_data <span style="color:#f92672">=</span> monte_carlo_training(env, num_episodes<span style="color:#f92672">=</span><span style="color:#ae81ff">5000</span>, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>, epsilon<span style="color:#f92672">=</span><span style="color:#ae81ff">0.3</span>)
 </span></span></code></pre></div><p><img alt="Monte-Carlo Visualization" loading="lazy" src="/images/CliffWalking-04-09-2025_04_41_PM.png"></p>
-<p>We can see the learnt policy is not ideally the optimal shortest path, and the agent is trying to avoid the grid next to the cliff in its first several steps, why? This is a explainable:</p>
+<p>We can see the learned policy is not ideally the optimal shortest path, and the agent is trying to avoid the grid next to the cliff in its first several steps, why? This is explainable:</p>
 <ul>
-<li>The $Q$ value fuction is averaged over episodes, an early cliff fall trace will drag the <strong>average return</strong> for those cliff-adjacent grids.</li>
-<li>Also we used $\epsilon$-greedy policy, so even in later episodes when the agent learnt a good policy, they will still randomly explore and occasionally fall off the cliff in cliff-adjacent grids.</li>
+<li>The $Q$ value function is averaged over episodes, an early cliff fall trace will drag the <strong>average return</strong> for those cliff-adjacent grids.</li>
+<li>Also, we used $\epsilon$-greedy policy, so even in later episodes when the agent learned a good policy, they will still randomly explore and occasionally fall off the cliff in cliff-adjacent grids.</li>
 </ul>
 <h2 id="7-temporal-difference-methods">7. Temporal-Difference Methods<a hidden class="anchor" aria-hidden="true" href="#7-temporal-difference-methods">#</a></h2>
-<p>In previous illustration of Monte Carlo methods, it estimate the value function using complete episodes. While this is intuitively simple and unbiased, it&rsquo;s very sample-inefficient. The value function updates only happen at the end of episodes, learning can be slow—especially in environments with long or variable episode lengths.</p>
+<p>In previous illustrations of Monte Carlo methods, it estimates the value function using complete episodes. While this is intuitively simple and unbiased, it&rsquo;s very sample-inefficient. The value function updates only happen at the end of episodes, learning can be slow—especially in environments with long or variable episode lengths.</p>
 <p>Temporal-Difference (TD) methods address these limitations by updating value estimates after each time step using bootstrapped predictions, leading to faster and more stable learning.</p>
-<p>I found an intuitive way to understand the difference between TD and MC methods are compare this to <strong>Gradient Descent</strong> and <strong>SGD</strong> in neural netwrok optimization, but in the temporal axis, view one step in RL as one batch in supervised model training.</p>
+<p>I found an intuitive way to understand the difference between TD and MC methods are compare this to <strong>Gradient Descent</strong> and <strong>SGD</strong> in neural network optimization, but in the temporal axis, view one step in RL as one batch in supervised model training.</p>
 <ul>
-<li>Gradient descent computes the gradient using the full dataset, while <em>SGD</em> compute using only data points in current batch, update the parameters, then move to the next batch.</li>
-<li>Monte-Carlo methods generates a full episode, backpropogated along the episode to update value function. While TD methods run one step, used its TD difference to update value function, then move to the next step.</li>
+<li>Gradient descent computes the gradient using the full dataset, while <em>SGD</em> compute using only data points in the current batch, update the parameters, then move to the next batch.</li>
+<li>Monte-Carlo methods generate a full episode, backpropagate along the episode to update the value function. While TD methods run one step, use its TD difference to update the value function, then move to the next step.</li>
 </ul>
 <p>Then how is TD-difference computed, remember we want to estimate value function using:
 $$
 V(s_t)\ = r_{t+1} + \gamma\ V(s_{t+1})
 $$</p>
-<p>So we can bootstrap at $s_t$, execute one more step and compute the value estimates and used it to update the value function:
+<p>So we can bootstrap at $s_t$, execute one more step and compute the value estimates and use it to update the value function:
 $$
 G(s_t) = r_{t+1} + \gamma\ V(s_{t+1})
 \newline
@@ -915,16 +953,16 @@ $$</p>
 <li>$\alpha$ is the single step learning rate</li>
 </ul>
 <h3 id="71-sarsa">7.1. SARSA<a hidden class="anchor" aria-hidden="true" href="#71-sarsa">#</a></h3>
-<p>SARSA is one of the most straightforward awy in TD-methods. The idea is intuitive, using next step&rsquo;s $Q(s_{t+1}, a_{t+1})$ to subtract current step&rsquo;s $Q(s_{t}, a_{t})$ as the TD error, and update value function.
+<p>SARSA is one of the most straightforward ways in TD-methods. The idea is intuitive, using next step&rsquo;s $Q(s_{t+1}, a_{t+1})$ to subtract current step&rsquo;s $Q(s_{t}, a_{t})$ as the TD error, and update value function.
 $$
 G(s_t) = r_{t+1} + \gamma\ Q(s_{t+1}, a_{t+1}) \newline
 Q(s_{t}, a_{t}) \leftarrow Q(s_{t}, a_{t}) + \alpha \cdot (G(s_t) - Q(s_t, a_t))
 $$
-In every step, we need to get its current state $s_t$, action $a_t$, bootstrap one step forward, get the reward $r_{t+1}$, the new state $s_{t+1}$ and action $a_{t+1}$. In each step, we need the sequence of $&lt;s_t, a_t, r_{t+1}, s_{t+1}, a_{t+1}&gt;$, and this is why this method called <em>SARSA</em>.</p>
+In every step, we need to get its current state $s_t$, action $a_t$, bootstrap one step forward, get the reward $r_{t+1}$, the new state $s_{t+1}$ and action $a_{t+1}$. In each step, we need the sequence of $&lt;s_t, a_t, r_{t+1}, s_{t+1}, a_{t+1}&gt;$, and this is why this method is called <em>SARSA</em>.</p>
 <h3 id="711-sarsa-method-in-cliff-walking">7.1.1 SARSA method in Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#711-sarsa-method-in-cliff-walking">#</a></h3>
 <ul>
 <li>
-<p>Step 0, Initilization:</p>
+<p>Step 0, Initialization:</p>
 <ul>
 <li>Initialize a random value function: $Q(s, a)$</li>
 <li>Initialize an $\epsilon$-greedy policy</li>
@@ -948,8 +986,13 @@ In every step, we need to get its current state $s_t$, action $a_t$, bootstrap o
 <p>Finish 1 episode by repeated running step 1-2 until the agent reached <code>goal</code> state.</p>
 </li>
 <li>
-<p>Run above algorithm multiple times until the policy converge.</p>
+<p>Run above algorithm multiple times until the policy converges.</p>
 </li>
+</ul>
+<p>This looks very similar to SARSA, the only difference is:</p>
+<ul>
+<li>We no longer need to sample $s_{t+1}$ in each step.</li>
+<li>We used $max\ Q(s_{t+1})$ instead of $Q(s_{t+1}, a_{t+1})$ for value update.</li>
 </ul>
 <h3 id="712-python-implementation-of-sarsa">7.1.2 Python Implementation of SARSA<a hidden class="anchor" aria-hidden="true" href="#712-python-implementation-of-sarsa">#</a></h3>
 <h4 id="7121-sarsa">7.1.2.1 SARSA<a hidden class="anchor" aria-hidden="true" href="#7121-sarsa">#</a></h4>
@@ -997,22 +1040,22 @@ In every step, we need to get its current state $s_t$, action $a_t$, bootstrap o
 <p>We train SARSA for 10000 episodes, and visualize the result</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>sarsa_progress <span style="color:#f92672">=</span> td_sarsa_training(env, num_episodes<span style="color:#f92672">=</span><span style="color:#ae81ff">10000</span>, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>, epsilon<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.2</span>)
 </span></span></code></pre></div><p><img alt="SARSA Training Visualization" loading="lazy" src="/images/CliffWalking-04-09-2025_09_47_PM.png"></p>
-<p>The learnt policy in <code>epoch=9999</code> is similar to that learnt from MC methods, that it tries to avoid the cliff-adjacent grids, the reasoning is also similar:</p>
+<p>The learned policy in <code>epoch=9999</code> is similar to that learned from MC methods, that it tries to avoid the cliff-adjacent grids, the reasoning is also similar:</p>
 <ul>
-<li>The agent used $\epsilon$-greedy search, so even the agent learnt a good policy, its exploration nature may still lead to fall off in cliff-adjacent grids. So the agent learnt to walk far away from the cliff, taking the constant cost of extra <code>-1</code> reward, to avoid a potential <code>-100</code> reward.</li>
+<li>The agent used $\epsilon$-greedy search, so even the agent learned a good policy, its exploration nature may still lead to fall off in cliff-adjacent grids. So the agent learned to walk far away from the cliff, taking the constant cost of extra <code>-1</code> reward, to avoid a potential <code>-100</code> reward.</li>
 </ul>
 <h3 id="72-q-learning">7.2 Q-Learning<a hidden class="anchor" aria-hidden="true" href="#72-q-learning">#</a></h3>
 <p>Let&rsquo;s recap the SARSA algorithm again, it used $\epsilon$-greedy search on $Q$ value functions for two purposes:</p>
 <ol>
-<li><strong>Planning</strong>: Decide the action $a_{t+1}$ of next step</li>
-<li><strong>Policy Update</strong>: use the actual action $a_{t+1}$ to update value function.</li>
+<li><strong>Planning</strong>: Decide the action $a_{t+1}$ of the next step</li>
+<li><strong>Policy Update</strong>: use the actual action $a_{t+1}$ to update the value function.</li>
 </ol>
-<p>So this policy have to encorporate a trade-off between exploration and exploitation. What if we have two policies:</p>
+<p>So this policy has to incorporate a trade-off between exploration and exploitation. What if we have two policies:</p>
 <ol>
-<li>One <strong>Behavior Policy</strong> that focused on exploration, it decides the interaction with the environment.</li>
-<li>One <strong>Target Policy</strong> that focused on exploitation, it doesn&rsquo;t do interaction, but focused on learning from previous interactions.</li>
+<li>One <strong>Behavior Policy</strong> that focuses on exploration, it decides the interaction with the environment.</li>
+<li>One <strong>Target Policy</strong> that focuses on exploitation, it doesn&rsquo;t do interaction, but focuses on learning from previous interactions.</li>
 </ol>
-<p>Then the behavior policy can be more aggressive to keep exploring risky areas, without fearing these risky behaviors affect its value function. On the other hand, its target policy focused on greedily learning the optimal policy, without being penalized by random exploratary behaviors.</p>
+<p>Then the behavior policy can be more aggressive to keep exploring risky areas, without fearing these risky behaviors affect its value function. On the other hand, its target policy focuses on greedily learning the optimal policy, without being penalized by random exploratory behaviors.</p>
 <p>This new method is called Q-Learning, the difference between SARSA and Q-Learning can also formalize as <strong>On-Policy</strong> vs <strong>Off-Policy</strong>:</p>
 <ul>
 <li><strong>On-Policy</strong> learns the value of the policy it is actually using to make decisions.</li>
@@ -1023,7 +1066,7 @@ In every step, we need to get its current state $s_t$, action $a_t$, bootstrap o
 G(s_t) = r_{t+1} + \gamma\ Q(s_{t+1}, a_{t+1}) \newline
 Q(s_{t}, a_{t}) \leftarrow Q(s_{t}, a_{t}) + \alpha \cdot (G(s_t) - Q(s_t, a_t))
 $$</p>
-<p>In Q-Learning, we used the theoretical optimal next action instead of actual next action for updates:
+<p>In Q-Learning, we used the theoretical optimal next action instead of the actual next action for updates:
 $$
 G(s_t) = r_{t+1} + \gamma\ \underset{a}{max}\ Q(s_{t+1}) \newline
 Q(s_{t}, a_{t}) \leftarrow Q(s_{t}, a_{t}) + \alpha \cdot (G(s_t) - Q(s_t, a_t))
@@ -1031,7 +1074,7 @@ $$</p>
 <h3 id="721-q-learning-in-cliff-walking">7.2.1 Q-Learning in Cliff Walking<a hidden class="anchor" aria-hidden="true" href="#721-q-learning-in-cliff-walking">#</a></h3>
 <ul>
 <li>
-<p>Step 0, Initilization:</p>
+<p>Step 0, Initialization:</p>
 <ul>
 <li>Initialize a random value function: $Q(s, a)$</li>
 <li>Initialize an $\epsilon$-greedy policy</li>
@@ -1054,7 +1097,7 @@ $$</p>
 <p>Finish 1 episode by repeated running step 1-2 until the agent reached <code>goal</code> state.</p>
 </li>
 <li>
-<p>Run above algorithm multiple times until the policy converge.</p>
+<p>Run above algorithm multiple times until the policy converges.</p>
 </li>
 </ul>
 <p>This looks very similar to SARSA, the only difference is:</p>
@@ -1074,6 +1117,7 @@ $$</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>        <span style="color:#75715e"># TD-Update current function</span>
 </span></span><span style="display:flex;"><span>        Q[state][action] <span style="color:#f92672">+=</span> alpha<span style="color:#f92672">*</span>(reward <span style="color:#f92672">+</span> gamma<span style="color:#f92672">*</span>max(Q[next_state]) <span style="color:#f92672">-</span> Q[state][action])
+</span></span><span style="display:flex;"><span>        
 </span></span><span style="display:flex;"><span>        state <span style="color:#f92672">=</span> next_state
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    policy <span style="color:#f92672">=</span> defaultdict(int)

@@ -20,9 +20,8 @@
       <link>http://localhost:1313/posts/rl-intro/</link>
       <pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/rl-intro/</guid>
-      <description>&lt;h2 id=&#34;intuition&#34;&gt;Intuition&lt;/h2&gt;
-&lt;p&gt;I&amp;rsquo;ve been having interests in Reinforcement Learning(RL) for a while, especially after ChatGPT when everyone was talking about &lt;code&gt;RLHF&lt;/code&gt;, but often felt it&amp;rsquo;s too daunting for me to do some reading and dig into it. Recently I finally found some spare time to go through it, and fortunately the famous Richard Sutton&amp;rsquo;s &amp;lt;Reinforcement Learning: an Introduction&amp;gt; book is surprisingly intuitive even for RL beginners.&lt;/p&gt;
-&lt;p&gt;However, the mathematical notions used in RL is quite different from those used in supervised learning, and may felt weird or confusing for beginners just like me. As a reference, I will share and summarize my reading notes here.&lt;/p&gt;</description>
+      <description>&lt;h2 id=&#34;1-intuition&#34;&gt;1. Intuition&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;ve been interested in Reinforcement Learning (RL) for a while, especially following the recent advancements in LLM post-training using RL. However, the mathematical concepts and various notions used in RL differ significantly from those in supervised learning, which can feel strange or confusing for beginners like myself. For instance, in traditional machine learning, we typically discuss &lt;code&gt;model&lt;/code&gt;, &lt;code&gt;data&lt;/code&gt;, and &lt;code&gt;loss function&lt;/code&gt;. In contrast, RL introduces terms like &lt;code&gt;on-policy&lt;/code&gt;, &lt;code&gt;reward&lt;/code&gt;, &lt;code&gt;model-free&lt;/code&gt;, and &lt;code&gt;agent&lt;/code&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>KV Cache Explained</title>

@@ -717,10 +717,6 @@ In every step, we need to get its current state $s_t$, action $a_t$, bootstrap o
 - Finish 1 episode by repeated running step 1-2 until the agent reached `goal` state.
 - Run above algorithm multiple times until the policy converges.
 
-This looks very similar to SARSA, the only difference is:
-- We no longer need to sample $s_{t+1}$ in each step.
-- We used $max\ Q(s_{t+1})$ instead of $Q(s_{t+1}, a_{t+1})$ for value update.
-
 #### 6.2.2 Python Implementation of SARSA
 ##### 6.1.2.1 SARSA
 ```python
@@ -750,7 +746,7 @@ def sarsa_one_epoch(env, Q, gamma=0.9, epsilon=0.1, alpha=0.1):
     return Q, policy
 ```
 - We use the same $\epsilon$-greedy search to get the action
-- The $Q$ value function is updated within each step of the epoch, this is called **1-step SARSA**, alternatively, we can also update $Q$ value function every fixed number of steps, which is called **$n$-step SARSA**
+- The value function `Q` is updated within each step of the epoch, this is called **1-step SARSA**, alternatively, we can also update `Q` every fixed number of steps, which is called **$n$-step SARSA**
 
 To train multiple episodes: 
 ```python
